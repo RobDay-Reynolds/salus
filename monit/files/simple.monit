@@ -1,0 +1,5 @@
+check process test_process
+  with pidfile /path/to/pid
+  start program /path/to/start/command
+  stop program "/path/to/command with args"
+  group test_group
