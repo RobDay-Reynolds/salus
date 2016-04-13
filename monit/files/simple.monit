@@ -4,8 +4,7 @@ check process test_process
   stop program "/path/to/test/command with args"
   group test_group
 
-check process other_process
-  with pidfile /path/to/other/pid
-  start program /path/to/start/other/command
-  stop program "/path/to/other/command with args"
+check file file_check
+  with path /path/to/file
+  if changed /path/to/command
   group test_group
