@@ -8,18 +8,48 @@ import (
 )
 
 var _ = Describe("ReadMonitFile", func() {
-	It("creates MonitFile struct with Check structs for a check in the file", func() {
-		monitFile, err := ReadMonitFile(fixturesPath + "/simple.monit")
+	Context("with a normally formatted monit file", func() {
+		It("creates MonitFile struct with Check structs for a check in the file", func() {
+			monitFile, err := ReadMonitFile(fixturesPath + "/simple.monit")
 
-		Expect(err).To(BeNil())
+			Expect(err).To(BeNil())
 
-		simpleCheck := ProcessCheck{
-			Pidfile:      "/path/to/pid",
-			StartProgram: "/path/to/start/command",
-			StopProgram:  "/path/to/command with args",
-			Group:        "test_group",
-		}
+			simpleCheck := ProcessCheck{
+				Name:         "test_process",
+				Pidfile:      "/path/to/test/pid",
+				StartProgram: "/path/to/test/start/command",
+				StopProgram:  "/path/to/test/command with args",
+				Group:        "test_group",
+			}
 
-		Expect(monitFile.Checks).To(Equal([]Check{simpleCheck}))
+			anotherCheck := ProcessCheck{
+				Name:         "other_process",
+				Pidfile:      "/path/to/other/pid",
+				StartProgram: "/path/to/start/other/command",
+				StopProgram:  "/path/to/other/command with args",
+				Group:        "test_group",
+			}
+
+			Expect(monitFile.Checks[0]).To(Equal(simpleCheck))
+			Expect(monitFile.Checks[1]).To(Equal(anotherCheck))
+		})
+	})
+
+	Context("with a re-ordered monit file", func() {
+		It("creates MonitFile struct with Check struct for a check in the file", func() {
+			monitFile, err := ReadMonitFile(fixturesPath + "/unordered.monit")
+
+			Expect(err).To(BeNil())
+
+			simpleCheck := ProcessCheck{
+				Name:         "test_process",
+				Pidfile:      "/path/to/test/pid",
+				StartProgram: "/path/to/test/start/command",
+				StopProgram:  "/path/to/test/command with args",
+				Group:        "test_group",
+			}
+
+			Expect(monitFile.Checks[0]).To(Equal(simpleCheck))
+		})
 	})
 })

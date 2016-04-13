@@ -13,6 +13,7 @@ type MonitFile struct {
 type Check interface{}
 
 type ProcessCheck struct {
+	Name         string
 	Pidfile      string
 	StartProgram string
 	StopProgram  string
@@ -23,32 +24,70 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 	bytes, err := ioutil.ReadFile(filepath)
 
 	if err != nil {
-		//Do something
+		// Do something
 	}
 
 	lines := strings.Split(string(bytes), "\n")
 
-	pidfile := getArgForLine(lines[1], "with pidfile")
-	startProgram := getArgForLine(lines[2], "start program")
-	stopProgram := getArgForLine(lines[3], "stop program")
-	group := getArgForLine(lines[4], "group ")
+	checks := []Check{}
 
-	monitFile := MonitFile{
-		Checks: []Check{
-			ProcessCheck{
-				Pidfile:      pidfile,
-				StartProgram: startProgram,
-				StopProgram:  stopProgram,
-				Group:        group,
-			},
-		},
+	i := 0
+	for _, line := range lines {
+		match, err := regexp.Match("check process", []byte(line))
+
+		if err != nil {
+			// Do something
+		}
+
+		if match {
+			check := createProcessCheck(lines, i)
+			checks = append(checks, check)
+
+			lines = append(lines[:i], lines[i+5:]...)
+		}
+
+		i++
 	}
+
+	monitFile := MonitFile{checks}
 
 	return monitFile, nil
 }
 
-func getArgForLine(line, prefix string) string {
-	myString := strings.TrimSpace(strings.Split(line, prefix)[1])
+func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
+	name := getArgForLine(lines, "check process")
+	pidfile := getArgForLine(lines, "with pidfile")
+	startProgram := getArgForLine(lines, "start program")
+	stopProgram := getArgForLine(lines, "stop program")
+	group := getArgForLine(lines, "group ")
+
+	check := ProcessCheck{
+		Name:         name,
+		Pidfile:      pidfile,
+		StartProgram: startProgram,
+		StopProgram:  stopProgram,
+		Group:        group,
+	}
+
+	return check
+}
+
+func getArgForLine(lines []string, prefix string) string {
+	var myString string
+
+	for _, line := range lines {
+		match, err := regexp.Match(prefix, []byte(line))
+
+		if err != nil {
+			// Do something
+		}
+
+		if match {
+			myString = strings.TrimSpace(strings.Split(line, prefix)[1])
+
+			break
+		}
+	}
 
 	reg := regexp.MustCompile(`"([^"]*)"`)
 	return reg.ReplaceAllString(myString, "${1}")

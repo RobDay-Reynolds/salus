@@ -1,5 +1,11 @@
 check process test_process
-  with pidfile /path/to/pid
-  start program /path/to/start/command
-  stop program "/path/to/command with args"
+  with pidfile /path/to/test/pid
+  start program /path/to/test/start/command
+  stop program "/path/to/test/command with args"
+  group test_group
+
+check process other_process
+  with pidfile /path/to/other/pid
+  start program /path/to/start/other/command
+  stop program "/path/to/other/command with args"
   group test_group
