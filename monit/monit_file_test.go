@@ -20,6 +20,7 @@ var _ = Describe("ReadMonitFile", func() {
 				StartProgram: "/path/to/test/start/command",
 				StopProgram:  "/path/to/test/command with args",
 				Group:        "test_group",
+				DependsOn:    "file_check",
 			}
 
 			anotherCheck := FileCheck{
@@ -27,6 +28,7 @@ var _ = Describe("ReadMonitFile", func() {
 				Path:      "/path/to/file",
 				IfChanged: "/path/to/command",
 				Group:     "test_group",
+				DependsOn: "something_else",
 			}
 
 			Expect(monitFile.Checks[0]).To(Equal(simpleCheck))

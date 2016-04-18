@@ -18,6 +18,7 @@ type ProcessCheck struct {
 	StartProgram string
 	StopProgram  string
 	Group        string
+	DependsOn    string
 }
 
 type FileCheck struct {
@@ -25,6 +26,7 @@ type FileCheck struct {
 	Path      string
 	IfChanged string
 	Group     string
+	DependsOn string
 }
 
 func ReadMonitFile(filepath string) (MonitFile, error) {
@@ -73,6 +75,7 @@ func createProcessCheck(lines []string, startingIndex int) (ProcessCheck, int) {
 	startProgram := getArgForLine(lines, "start program")
 	stopProgram := getArgForLine(lines, "stop program")
 	group := getArgForLine(lines, "group ")
+	dependsOn := getArgForLine(lines, "depends on ")
 
 	values := []string{
 		name,
@@ -80,6 +83,7 @@ func createProcessCheck(lines []string, startingIndex int) (ProcessCheck, int) {
 		startProgram,
 		stopProgram,
 		group,
+		dependsOn,
 	}
 	numMatches := 0
 
@@ -95,6 +99,7 @@ func createProcessCheck(lines []string, startingIndex int) (ProcessCheck, int) {
 		StartProgram: startProgram,
 		StopProgram:  stopProgram,
 		Group:        group,
+		DependsOn:    dependsOn,
 	}
 
 	return check, numMatches
@@ -105,12 +110,14 @@ func createFileCheck(lines []string, startingIndex int) (FileCheck, int) {
 	path := getArgForLine(lines, "with path")
 	ifChanged := getArgForLine(lines, "if changed")
 	group := getArgForLine(lines, "group ")
+	dependsOn := getArgForLine(lines, "depends on ")
 
 	values := []string{
 		name,
 		path,
 		ifChanged,
 		group,
+		dependsOn,
 	}
 	numMatches := 0
 
@@ -125,6 +132,7 @@ func createFileCheck(lines []string, startingIndex int) (FileCheck, int) {
 		Path:      path,
 		IfChanged: ifChanged,
 		Group:     group,
+		DependsOn: dependsOn,
 	}
 
 	return check, numMatches

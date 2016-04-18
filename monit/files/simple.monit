@@ -3,8 +3,10 @@ check process test_process
   start program /path/to/test/start/command
   stop program "/path/to/test/command with args"
   group test_group
+  depends on file_check
 
 check file file_check
   with path /path/to/file
   if changed /path/to/command
   group test_group
+  depends on something_else
