@@ -1,0 +1,5 @@
+check process short_process
+  with pidfile /path/to/short/pid
+
+check process another_process
+  with pidfile /path/to/another/pid

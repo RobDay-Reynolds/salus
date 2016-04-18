@@ -48,15 +48,15 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 		}
 
 		if processMatch {
-			check := createProcessCheck(lines, i)
+			check, numLines := createProcessCheck(lines, i)
 			checks = append(checks, check)
 
-			lines = append(lines[:i], lines[i+4:]...)
+			lines = append([]string{}, lines[numLines:]...)
 		} else if fileMatch {
-			check := createFileCheck(lines, i)
+			check, numLines := createFileCheck(lines, i)
 			checks = append(checks, check)
 
-			lines = append(lines[:i], lines[i+3:]...)
+			lines = append([]string{}, lines[numLines:]...)
 		}
 
 		i++
@@ -67,12 +67,27 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 	return monitFile, nil
 }
 
-func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
+func createProcessCheck(lines []string, startingIndex int) (ProcessCheck, int) {
 	name := getArgForLine(lines, "check process")
 	pidfile := getArgForLine(lines, "with pidfile")
 	startProgram := getArgForLine(lines, "start program")
 	stopProgram := getArgForLine(lines, "stop program")
 	group := getArgForLine(lines, "group ")
+
+	values := []string{
+		name,
+		pidfile,
+		startProgram,
+		stopProgram,
+		group,
+	}
+	numMatches := 0
+
+	for _, value := range values {
+		if value != "" {
+			numMatches++
+		}
+	}
 
 	check := ProcessCheck{
 		Name:         name,
@@ -82,14 +97,28 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 		Group:        group,
 	}
 
-	return check
+	return check, numMatches
 }
 
-func createFileCheck(lines []string, startingIndex int) FileCheck {
+func createFileCheck(lines []string, startingIndex int) (FileCheck, int) {
 	name := getArgForLine(lines, "check file")
 	path := getArgForLine(lines, "with path")
 	ifChanged := getArgForLine(lines, "if changed")
 	group := getArgForLine(lines, "group ")
+
+	values := []string{
+		name,
+		path,
+		ifChanged,
+		group,
+	}
+	numMatches := 0
+
+	for _, value := range values {
+		if value != "" {
+			numMatches++
+		}
+	}
 
 	check := FileCheck{
 		Name:      name,
@@ -98,7 +127,7 @@ func createFileCheck(lines []string, startingIndex int) FileCheck {
 		Group:     group,
 	}
 
-	return check
+	return check, numMatches
 }
 
 func getArgForLine(lines []string, prefix string) string {

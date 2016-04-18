@@ -51,4 +51,25 @@ var _ = Describe("ReadMonitFile", func() {
 			Expect(monitFile.Checks[0]).To(Equal(simpleCheck))
 		})
 	})
+
+	Context("with non-standard check lengths", func() {
+		It("creates MonitFile struct with Check struct for all checks in the file", func() {
+			monitFile, err := ReadMonitFile(fixturesPath + "/short_entries.monit")
+
+			Expect(err).To(BeNil())
+
+			shortCheck := ProcessCheck{
+				Name:    "short_process",
+				Pidfile: "/path/to/short/pid",
+			}
+
+			anotherCheck := ProcessCheck{
+				Name:    "another_process",
+				Pidfile: "/path/to/another/pid",
+			}
+
+			Expect(monitFile.Checks[0]).To(Equal(shortCheck))
+			Expect(monitFile.Checks[1]).To(Equal(anotherCheck))
+		})
+	})
 })
