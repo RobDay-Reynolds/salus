@@ -14,16 +14,7 @@ var _ = Describe("ReadMonitFile", func() {
 
 			Expect(err).To(BeNil())
 
-			simpleCheck := ProcessCheck{
-				Name:         "test_process",
-				Pidfile:      "/path/to/test/pid",
-				StartProgram: "/path/to/test/start/command",
-				StopProgram:  "/path/to/test/command with args",
-				Group:        "test_group",
-				DependsOn:    "file_check",
-			}
-
-			anotherCheck := FileCheck{
+			fileCheck := FileCheck{
 				Name:      "file_check",
 				Path:      "/path/to/file",
 				IfChanged: "/path/to/command",
@@ -31,8 +22,25 @@ var _ = Describe("ReadMonitFile", func() {
 				DependsOn: "something_else",
 			}
 
-			Expect(monitFile.Checks[0]).To(Equal(simpleCheck))
-			Expect(monitFile.Checks[1]).To(Equal(anotherCheck))
+			failedSocket := FailedSocket{
+				SocketFile: "/path/to/socket.sock",
+				Timeout:    5,
+				NumCycles:  5,
+				Action:     "restart",
+			}
+
+			processCheck := ProcessCheck{
+				Name:         "test_process",
+				Pidfile:      "/path/to/test/pid",
+				StartProgram: "/path/to/test/start/command",
+				StopProgram:  "/path/to/test/command with args",
+				FailedSocket: failedSocket,
+				Group:        "test_group",
+				DependsOn:    "file_check",
+			}
+
+			Expect(monitFile.Checks[0]).To(Equal(fileCheck))
+			Expect(monitFile.Checks[1]).To(Equal(processCheck))
 		})
 	})
 
@@ -42,11 +50,19 @@ var _ = Describe("ReadMonitFile", func() {
 
 			Expect(err).To(BeNil())
 
+			failedSocket := FailedSocket{
+				SocketFile: "/path/to/another/socket.sock",
+				Timeout:    60,
+				NumCycles:  15,
+				Action:     "stop",
+			}
+
 			simpleCheck := ProcessCheck{
 				Name:         "test_process",
 				Pidfile:      "/path/to/test/pid",
 				StartProgram: "/path/to/test/start/command",
 				StopProgram:  "/path/to/test/command with args",
+				FailedSocket: failedSocket,
 				Group:        "test_group",
 			}
 
@@ -66,8 +82,9 @@ var _ = Describe("ReadMonitFile", func() {
 			}
 
 			anotherCheck := ProcessCheck{
-				Name:    "another_process",
-				Pidfile: "/path/to/another/pid",
+				Name:         "another_process",
+				Pidfile:      "/path/to/another/pid",
+				StartProgram: "/path/to/short/start/command",
 			}
 
 			Expect(monitFile.Checks[0]).To(Equal(shortCheck))

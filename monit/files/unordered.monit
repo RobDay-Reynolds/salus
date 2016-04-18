@@ -2,4 +2,7 @@ check process test_process
   with pidfile /path/to/test/pid
   stop program "/path/to/test/command with args"
   start program /path/to/test/start/command
+  if failed unixsocket /path/to/another/socket.sock
+    with timeout 60 seconds for 15 cycles
+  then stop
   group test_group

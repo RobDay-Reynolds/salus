@@ -1,12 +1,15 @@
+check file file_check
+  with path /path/to/file
+  if changed /path/to/command
+  group test_group
+  depends on something_else
+
 check process test_process
   with pidfile /path/to/test/pid
   start program /path/to/test/start/command
   stop program "/path/to/test/command with args"
   group test_group
   depends on file_check
-
-check file file_check
-  with path /path/to/file
-  if changed /path/to/command
-  group test_group
-  depends on something_else
+  if failed unixsocket /path/to/socket.sock
+    with timeout 5 seconds for 5 cycles
+  then restart

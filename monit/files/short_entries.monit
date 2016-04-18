@@ -3,3 +3,4 @@ check process short_process
 
 check process another_process
   with pidfile /path/to/another/pid
+  start program /path/to/short/start/command
