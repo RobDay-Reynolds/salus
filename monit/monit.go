@@ -134,53 +134,21 @@ func createFileCheck(lines []string, startingIndex int) FileCheck {
 }
 
 func parseFailedUnixSocket(lines []string) FailedSocket {
-	var startingIndex, endingIndex int
-	var socketFile, timeout, numCycles, action string
-	var newLines []string
+	values := parseGroupBlock(
+		lines,
+		"socketFile",
+		map[string]string{
+			"socketFile": `if failed unixsocket (["/\w\.]+)`,
+			"timeout":    `with timeout ([0-9]+) seconds`,
+			"numCycles":  `for ([0-9]+) cycles`,
+			"action":     `then ([a-z]+)`,
+		},
+	)
 
-	for i, line := range lines {
-		newProcessCheck, err := regexp.Match("check process", []byte(line))
-		if err != nil {
-			// Do something
-		}
-
-		newFileCheck, err := regexp.Match("check file", []byte(line))
-		if err != nil {
-			// Do something
-		}
-
-		if newProcessCheck || newFileCheck {
-			break
-		}
-
-		socketMatch, err := regexp.Match("if failed unixsocket", []byte(line))
-
-		if err != nil {
-			// Do something
-		}
-
-		if socketMatch {
-			startingIndex = i
-
-			newLines = append([]string{}, lines[i:]...)
-			socketFile = captureWithRegex(newLines, `if failed unixsocket (["/\w\.]+)`, false)
-			timeout = captureWithRegex(newLines, `with timeout ([0-9]+) seconds`, false)
-			numCycles = captureWithRegex(newLines, `for ([0-9]+) cycles`, false)
-			action = captureWithRegex(newLines, `then ([a-z]+)`, false)
-
-			for j, newLine := range newLines {
-				thenMatch, err := regexp.Match("then ", []byte(newLine))
-
-				if err != nil {
-					// Do something
-				}
-
-				if thenMatch {
-					endingIndex = i + j
-				}
-			}
-		}
-	}
+	socketFile := values["socketFile"]
+	timeout := values["timeout"]
+	numCycles := values["numCycles"]
+	action := values["action"]
 
 	timeoutInt, err := strconv.Atoi(timeout)
 	if err != nil {
@@ -190,10 +158,6 @@ func parseFailedUnixSocket(lines []string) FailedSocket {
 	numCyclesInt, err := strconv.Atoi(numCycles)
 	if err != nil {
 		// Do something
-	}
-
-	if endingIndex != 0 {
-		removeElementsFromSlice(lines, startingIndex, endingIndex)
 	}
 
 	return FailedSocket{
@@ -205,10 +169,52 @@ func parseFailedUnixSocket(lines []string) FailedSocket {
 }
 
 func parseFailedHost(lines []string) FailedHost {
+	values := parseGroupBlock(
+		lines,
+		"host",
+		map[string]string{
+			"host":      `if failed host ([\w\.]+)`,
+			"port":      `port ([\d]+)`,
+			"protocol":  `protocol ([\w]+)`,
+			"timeout":   `with timeout ([0-9]+) seconds`,
+			"numCycles": `for ([0-9]+) cycles`,
+			"action":    `then ([a-z]+)`,
+		},
+	)
+
+	host := values["host"]
+	port := values["port"]
+	protocol := values["protocol"]
+	timeout := values["timeout"]
+	numCycles := values["numCycles"]
+	action := values["action"]
+
+	timeoutInt, err := strconv.Atoi(timeout)
+	if err != nil {
+		// Do something
+	}
+
+	numCyclesInt, err := strconv.Atoi(numCycles)
+	if err != nil {
+		// Do something
+	}
+
+	return FailedHost{
+		Host:      host,
+		Port:      port,
+		Protocol:  protocol,
+		Timeout:   timeoutInt,
+		NumCycles: numCyclesInt,
+		Action:    action,
+	}
+}
+
+func parseGroupBlock(lines []string, keyRegex string, regexes map[string]string) map[string]string {
 	var startingIndex, endingIndex int
-	var host, port, protocol string
-	var timeout, numCycles, action string
 	var newLines []string
+	values := map[string]string{}
+
+	startingRegex := regexp.MustCompile(regexes[keyRegex])
 
 	for i, line := range lines {
 		newProcessCheck, err := regexp.Match("check process", []byte(line))
@@ -225,22 +231,16 @@ func parseFailedHost(lines []string) FailedHost {
 			break
 		}
 
-		hostMatch, err := regexp.Match("if failed", []byte(line))
+		match := startingRegex.Match([]byte(line))
 
-		if err != nil {
-			// Do something
-		}
-
-		if hostMatch {
+		if match {
 			startingIndex = i
 
 			newLines = append([]string{}, lines[i:]...)
-			host = captureWithRegex(newLines, `if failed host ([\w\.]+)`, false)
-			port = captureWithRegex(newLines, `port ([\d]+)`, false)
-			protocol = captureWithRegex(newLines, `protocol ([\w]+)`, false)
-			timeout = captureWithRegex(newLines, `with timeout ([0-9]+) seconds`, false)
-			numCycles = captureWithRegex(newLines, `for ([0-9]+) cycles`, false)
-			action = captureWithRegex(newLines, `then ([a-z]+)`, false)
+
+			for key, regex := range regexes {
+				values[key] = captureWithRegex(newLines, regex, false)
+			}
 
 			for j, newLine := range newLines {
 				thenMatch, err := regexp.Match("then ", []byte(newLine))
@@ -256,28 +256,11 @@ func parseFailedHost(lines []string) FailedHost {
 		}
 	}
 
-	timeoutInt, err := strconv.Atoi(timeout)
-	if err != nil {
-		// Do something
-	}
-
-	numCyclesInt, err := strconv.Atoi(numCycles)
-	if err != nil {
-		// Do something
-	}
-
 	if endingIndex != 0 {
 		removeElementsFromSlice(lines, startingIndex, endingIndex)
 	}
 
-	return FailedHost{
-		Host:      host,
-		Port:      port,
-		Protocol:  protocol,
-		Timeout:   timeoutInt,
-		NumCycles: numCyclesInt,
-		Action:    action,
-	}
+	return values
 }
 
 func captureWithRegex(lines []string, reg string, removeLine bool) string {
