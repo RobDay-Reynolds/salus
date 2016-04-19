@@ -29,12 +29,22 @@ var _ = Describe("ReadMonitFile", func() {
 				Action:     "restart",
 			}
 
+			failedHost := FailedHost{
+				Host:      "1.2.3.4",
+				Port:      "9876",
+				Protocol:  "http",
+				Timeout:   20,
+				NumCycles: 10,
+				Action:    "stop",
+			}
+
 			processCheck := ProcessCheck{
 				Name:         "test_process",
 				Pidfile:      "/path/to/test/pid",
 				StartProgram: "/path/to/test/start/command",
 				StopProgram:  "/path/to/test/command with args",
 				FailedSocket: failedSocket,
+				FailedHost:   failedHost,
 				Group:        "test_group",
 				DependsOn:    "file_check",
 			}

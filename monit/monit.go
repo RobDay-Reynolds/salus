@@ -18,8 +18,9 @@ type ProcessCheck struct {
 	Pidfile      string
 	StartProgram string
 	StopProgram  string
-	Group        string
 	FailedSocket FailedSocket
+	FailedHost   FailedHost
+	Group        string
 	DependsOn    string
 }
 
@@ -28,6 +29,7 @@ type FileCheck struct {
 	Path         string
 	IfChanged    string
 	FailedSocket FailedSocket
+	FailedHost   FailedHost
 	Group        string
 	DependsOn    string
 }
@@ -37,6 +39,15 @@ type FailedSocket struct {
 	Timeout    int
 	NumCycles  int
 	Action     string
+}
+
+type FailedHost struct {
+	Host      string
+	Port      string
+	Protocol  string
+	Timeout   int
+	NumCycles int
+	Action    string
 }
 
 func ReadMonitFile(filepath string) (MonitFile, error) {
@@ -83,6 +94,7 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 	group := captureWithRegex(lines, `group (\w+)`, true)
 	dependsOn := captureWithRegex(lines, `depends on (\w+)`, true)
 	failedSocket := parseFailedUnixSocket(lines)
+	failedHost := parseFailedHost(lines)
 
 	check := ProcessCheck{
 		Name:         name,
@@ -90,6 +102,7 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 		StartProgram: startProgram,
 		StopProgram:  stopProgram,
 		FailedSocket: failedSocket,
+		FailedHost:   failedHost,
 		Group:        group,
 		DependsOn:    dependsOn,
 	}
@@ -99,17 +112,20 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 
 func createFileCheck(lines []string, startingIndex int) FileCheck {
 	name := captureWithRegex(lines, `check file ([\w"\.]+)`, true)
+	failedHost := parseFailedHost(lines)
+	failedSocket := parseFailedUnixSocket(lines)
+
 	path := captureWithRegex(lines, `with path ([\w"/\.]+)`, true)
 	ifChanged := captureWithRegex(lines, `if changed (.*)$`, true)
 	group := captureWithRegex(lines, `group (\w+)`, true)
 	dependsOn := captureWithRegex(lines, `depends on (\w+)`, true)
-	failedSocket := parseFailedUnixSocket(lines)
 
 	check := FileCheck{
 		Name:         name,
 		Path:         path,
 		IfChanged:    ifChanged,
 		FailedSocket: failedSocket,
+		FailedHost:   failedHost,
 		Group:        group,
 		DependsOn:    dependsOn,
 	}
@@ -147,7 +163,7 @@ func parseFailedUnixSocket(lines []string) FailedSocket {
 			startingIndex = i
 
 			newLines = append([]string{}, lines[i:]...)
-			socketFile = captureWithRegex(newLines, `if failed unixsocket ([\"/a-z\.]+)`, false)
+			socketFile = captureWithRegex(newLines, `if failed unixsocket (["/\w\.]+)`, false)
 			timeout = captureWithRegex(newLines, `with timeout ([0-9]+) seconds`, false)
 			numCycles = captureWithRegex(newLines, `for ([0-9]+) cycles`, false)
 			action = captureWithRegex(newLines, `then ([a-z]+)`, false)
@@ -185,6 +201,82 @@ func parseFailedUnixSocket(lines []string) FailedSocket {
 		Timeout:    timeoutInt,
 		NumCycles:  numCyclesInt,
 		Action:     action,
+	}
+}
+
+func parseFailedHost(lines []string) FailedHost {
+	var startingIndex, endingIndex int
+	var host, port, protocol string
+	var timeout, numCycles, action string
+	var newLines []string
+
+	for i, line := range lines {
+		newProcessCheck, err := regexp.Match("check process", []byte(line))
+		if err != nil {
+			// Do something
+		}
+
+		newFileCheck, err := regexp.Match("check file", []byte(line))
+		if err != nil {
+			// Do something
+		}
+
+		if newProcessCheck || newFileCheck {
+			break
+		}
+
+		hostMatch, err := regexp.Match("if failed", []byte(line))
+
+		if err != nil {
+			// Do something
+		}
+
+		if hostMatch {
+			startingIndex = i
+
+			newLines = append([]string{}, lines[i:]...)
+			host = captureWithRegex(newLines, `if failed host ([\w\.]+)`, false)
+			port = captureWithRegex(newLines, `port ([\d]+)`, false)
+			protocol = captureWithRegex(newLines, `protocol ([\w]+)`, false)
+			timeout = captureWithRegex(newLines, `with timeout ([0-9]+) seconds`, false)
+			numCycles = captureWithRegex(newLines, `for ([0-9]+) cycles`, false)
+			action = captureWithRegex(newLines, `then ([a-z]+)`, false)
+
+			for j, newLine := range newLines {
+				thenMatch, err := regexp.Match("then ", []byte(newLine))
+
+				if err != nil {
+					// Do something
+				}
+
+				if thenMatch {
+					endingIndex = i + j
+				}
+			}
+		}
+	}
+
+	timeoutInt, err := strconv.Atoi(timeout)
+	if err != nil {
+		// Do something
+	}
+
+	numCyclesInt, err := strconv.Atoi(numCycles)
+	if err != nil {
+		// Do something
+	}
+
+	if endingIndex != 0 {
+		removeElementsFromSlice(lines, startingIndex, endingIndex)
+	}
+
+	return FailedHost{
+		Host:      host,
+		Port:      port,
+		Protocol:  protocol,
+		Timeout:   timeoutInt,
+		NumCycles: numCyclesInt,
+		Action:    action,
 	}
 }
 
