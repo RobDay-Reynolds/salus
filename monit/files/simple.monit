@@ -13,6 +13,8 @@ check process test_process
   if failed unixsocket /path/to/socket.sock
     with timeout 5 seconds for 5 cycles
   then restart
-  if failed host 1.2.3.4 port 9876 protocol http
-    with timeout 20 seconds for 10 cycles
+  if failed host 1.2.3.4 port 9876 protocol http with timeout 20 seconds for 10 cycles
   then stop
+  if totalmem > 2048 Mb for 3 cycles then alert
+
+  if totalmem > 1024 Mb for 10 cycles then restart

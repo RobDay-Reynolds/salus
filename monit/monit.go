@@ -14,24 +14,26 @@ type MonitFile struct {
 type Check interface{}
 
 type ProcessCheck struct {
-	Name         string
-	Pidfile      string
-	StartProgram string
-	StopProgram  string
-	FailedSocket FailedSocket
-	FailedHost   FailedHost
-	Group        string
-	DependsOn    string
+	Name           string
+	Pidfile        string
+	StartProgram   string
+	StopProgram    string
+	FailedSocket   FailedSocket
+	FailedHost     FailedHost
+	TotalMemChecks []MemUsage
+	Group          string
+	DependsOn      string
 }
 
 type FileCheck struct {
-	Name         string
-	Path         string
-	IfChanged    string
-	FailedSocket FailedSocket
-	FailedHost   FailedHost
-	Group        string
-	DependsOn    string
+	Name           string
+	Path           string
+	IfChanged      string
+	FailedSocket   FailedSocket
+	FailedHost     FailedHost
+	TotalMemChecks []MemUsage
+	Group          string
+	DependsOn      string
 }
 
 type FailedSocket struct {
@@ -46,6 +48,12 @@ type FailedHost struct {
 	Port      string
 	Protocol  string
 	Timeout   int
+	NumCycles int
+	Action    string
+}
+
+type MemUsage struct {
+	MemLimit  int
 	NumCycles int
 	Action    string
 }
@@ -87,60 +95,69 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 }
 
 func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
-	name := captureWithRegex(lines, `check process ([\w"\.]+)`, true)
-	pidfile := captureWithRegex(lines, `with pidfile ([\w"/\.]+)`, true)
-	startProgram := captureWithRegex(lines, `start program (.*)$`, true)
-	stopProgram := captureWithRegex(lines, `stop program (.*)$`, true)
-	group := captureWithRegex(lines, `group (\w+)`, true)
-	dependsOn := captureWithRegex(lines, `depends on (\w+)`, true)
-	failedSocket := parseFailedUnixSocket(lines)
-	failedHost := parseFailedHost(lines)
+	name, lines := captureWithRegex(lines, `check process ([\w"\.]+)`, true)
+
+	totalMemChecks, lines := parseAllTotalMemChecks(lines)
+
+	pidfile, lines := captureWithRegex(lines, `with pidfile ([\w"/\.]+)`, true)
+	startProgram, lines := captureWithRegex(lines, `start program (.*)$`, true)
+	stopProgram, lines := captureWithRegex(lines, `stop program (.*)$`, true)
+	group, lines := captureWithRegex(lines, `group (\w+)`, true)
+	dependsOn, lines := captureWithRegex(lines, `depends on (\w+)`, true)
+
+	failedSocket, lines := parseFailedUnixSocket(lines)
+	failedHost, lines := parseFailedHost(lines)
 
 	check := ProcessCheck{
-		Name:         name,
-		Pidfile:      pidfile,
-		StartProgram: startProgram,
-		StopProgram:  stopProgram,
-		FailedSocket: failedSocket,
-		FailedHost:   failedHost,
-		Group:        group,
-		DependsOn:    dependsOn,
+		Name:           name,
+		Pidfile:        pidfile,
+		StartProgram:   startProgram,
+		StopProgram:    stopProgram,
+		FailedSocket:   failedSocket,
+		FailedHost:     failedHost,
+		TotalMemChecks: totalMemChecks,
+		Group:          group,
+		DependsOn:      dependsOn,
 	}
 
 	return check
 }
 
 func createFileCheck(lines []string, startingIndex int) FileCheck {
-	name := captureWithRegex(lines, `check file ([\w"\.]+)`, true)
-	failedHost := parseFailedHost(lines)
-	failedSocket := parseFailedUnixSocket(lines)
+	name, lines := captureWithRegex(lines, `check file ([\w"\.]+)`, true)
 
-	path := captureWithRegex(lines, `with path ([\w"/\.]+)`, true)
-	ifChanged := captureWithRegex(lines, `if changed (.*)$`, true)
-	group := captureWithRegex(lines, `group (\w+)`, true)
-	dependsOn := captureWithRegex(lines, `depends on (\w+)`, true)
+	totalMemChecks, lines := parseAllTotalMemChecks(lines)
+
+	path, lines := captureWithRegex(lines, `with path ([\w"/\.]+)`, true)
+	ifChanged, lines := captureWithRegex(lines, `if changed (.*)$`, true)
+	group, lines := captureWithRegex(lines, `group (\w+)`, true)
+	dependsOn, lines := captureWithRegex(lines, `depends on (\w+)`, true)
+
+	failedHost, lines := parseFailedHost(lines)
+	failedSocket, lines := parseFailedUnixSocket(lines)
 
 	check := FileCheck{
-		Name:         name,
-		Path:         path,
-		IfChanged:    ifChanged,
-		FailedSocket: failedSocket,
-		FailedHost:   failedHost,
-		Group:        group,
-		DependsOn:    dependsOn,
+		Name:           name,
+		Path:           path,
+		IfChanged:      ifChanged,
+		FailedSocket:   failedSocket,
+		FailedHost:     failedHost,
+		TotalMemChecks: totalMemChecks,
+		Group:          group,
+		DependsOn:      dependsOn,
 	}
 
 	return check
 }
 
-func parseFailedUnixSocket(lines []string) FailedSocket {
-	values := parseGroupBlock(
+func parseFailedUnixSocket(lines []string) (FailedSocket, []string) {
+	values, lines := parseGroupBlock(
 		lines,
 		"socketFile",
 		map[string]string{
 			"socketFile": `if failed unixsocket (["/\w\.]+)`,
-			"timeout":    `with timeout ([0-9]+) seconds`,
-			"numCycles":  `for ([0-9]+) cycles`,
+			"timeout":    `with timeout (\d+) seconds`,
+			"numCycles":  `for (\d+) cycles`,
 			"action":     `then ([a-z]+)`,
 		},
 	)
@@ -160,24 +177,26 @@ func parseFailedUnixSocket(lines []string) FailedSocket {
 		// Do something
 	}
 
-	return FailedSocket{
+	fs := FailedSocket{
 		SocketFile: socketFile,
 		Timeout:    timeoutInt,
 		NumCycles:  numCyclesInt,
 		Action:     action,
 	}
+
+	return fs, lines
 }
 
-func parseFailedHost(lines []string) FailedHost {
-	values := parseGroupBlock(
+func parseFailedHost(lines []string) (FailedHost, []string) {
+	values, lines := parseGroupBlock(
 		lines,
 		"host",
 		map[string]string{
 			"host":      `if failed host ([\w\.]+)`,
-			"port":      `port ([\d]+)`,
-			"protocol":  `protocol ([\w]+)`,
-			"timeout":   `with timeout ([0-9]+) seconds`,
-			"numCycles": `for ([0-9]+) cycles`,
+			"port":      `port (\d+)`,
+			"protocol":  `protocol (\w+)`,
+			"timeout":   `with timeout (\d+) seconds`,
+			"numCycles": `for (\d+) cycles`,
 			"action":    `then ([a-z]+)`,
 		},
 	)
@@ -199,7 +218,7 @@ func parseFailedHost(lines []string) FailedHost {
 		// Do something
 	}
 
-	return FailedHost{
+	fh := FailedHost{
 		Host:      host,
 		Port:      port,
 		Protocol:  protocol,
@@ -207,10 +226,59 @@ func parseFailedHost(lines []string) FailedHost {
 		NumCycles: numCyclesInt,
 		Action:    action,
 	}
+
+	return fh, lines
 }
 
-func parseGroupBlock(lines []string, keyRegex string, regexes map[string]string) map[string]string {
-	var startingIndex, endingIndex int
+func parseTotalMem(lines []string) (MemUsage, []string) {
+	totalMemLineEnding, lines := captureWithRegex(lines, `if totalmem > (.*$)`, true)
+
+	tmpLines := []string{totalMemLineEnding}
+	memLimit, _ := captureWithRegex(tmpLines, `(\d+) Mb`, false)
+	numCycles, _ := captureWithRegex(tmpLines, `for (\d+) cycles`, false)
+	action, _ := captureWithRegex(tmpLines, `then (\w+)`, false)
+
+	memLimitInt, err := strconv.Atoi(memLimit)
+	if err != nil {
+		// Do something
+	}
+
+	numCyclesInt, err := strconv.Atoi(numCycles)
+	if err != nil {
+		// Do something
+	}
+
+	mu := MemUsage{
+		MemLimit:  memLimitInt,
+		NumCycles: numCyclesInt,
+		Action:    action,
+	}
+
+	return mu, lines
+}
+
+func parseAllTotalMemChecks(lines []string) ([]MemUsage, []string) {
+	var memChecks []MemUsage
+	var memCheck MemUsage
+
+	for _, line := range lines {
+		memCheckMatch, err := regexp.Match("if totalmem", []byte(line))
+		if err != nil {
+			// Do something
+		}
+
+		if memCheckMatch {
+			memCheck, lines = parseTotalMem(lines)
+			memChecks = append(memChecks, memCheck)
+		}
+	}
+
+	return memChecks, lines
+}
+
+func parseGroupBlock(lines []string, keyRegex string, regexes map[string]string) (map[string]string, []string) {
+	var startingIndex int
+	//	var endingIndex int
 	var newLines []string
 	values := map[string]string{}
 
@@ -239,31 +307,31 @@ func parseGroupBlock(lines []string, keyRegex string, regexes map[string]string)
 			newLines = append([]string{}, lines[i:]...)
 
 			for key, regex := range regexes {
-				values[key] = captureWithRegex(newLines, regex, false)
+				values[key], lines = captureWithRegex(newLines, regex, false)
 			}
 
-			for j, newLine := range newLines {
-				thenMatch, err := regexp.Match("then ", []byte(newLine))
-
-				if err != nil {
-					// Do something
-				}
-
-				if thenMatch {
-					endingIndex = i + j
-				}
-			}
+			//			for j, newLine := range newLines {
+			//				thenMatch, err := regexp.Match("then ", []byte(newLine))
+			//
+			//				if err != nil {
+			//					// Do something
+			//				}
+			//
+			//				if thenMatch {
+			//					endingIndex = i + j
+			//				}
+			//			}
 		}
 	}
 
-	if endingIndex != 0 {
-		removeElementsFromSlice(lines, startingIndex, endingIndex)
+	if len(values) > 0 {
+		removeElementsFromSlice(lines, startingIndex, startingIndex+1)
 	}
 
-	return values
+	return values, lines
 }
 
-func captureWithRegex(lines []string, reg string, removeLine bool) string {
+func captureWithRegex(lines []string, reg string, removeLine bool) (string, []string) {
 	var myString string
 
 	for i, line := range lines {
@@ -284,7 +352,7 @@ func captureWithRegex(lines []string, reg string, removeLine bool) string {
 			myString = strings.TrimSpace(values[1])
 
 			if removeLine {
-				lines = removeElementsFromSlice(lines, i, len(lines)-1)
+				lines = removeElementsFromSlice(lines, i, i+1)
 			}
 
 			break
@@ -294,7 +362,7 @@ func captureWithRegex(lines []string, reg string, removeLine bool) string {
 	}
 
 	stripReg := regexp.MustCompile(`"([^"]*)"`)
-	return stripReg.ReplaceAllString(myString, "${1}")
+	return stripReg.ReplaceAllString(myString, "${1}"), lines
 }
 
 func removeElementsFromSlice(slice []string, startingIndex int, endingIndex int) []string {

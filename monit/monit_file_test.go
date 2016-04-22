@@ -38,18 +38,31 @@ var _ = Describe("ReadMonitFile", func() {
 				Action:    "stop",
 			}
 
-			processCheck := ProcessCheck{
-				Name:         "test_process",
-				Pidfile:      "/path/to/test/pid",
-				StartProgram: "/path/to/test/start/command",
-				StopProgram:  "/path/to/test/command with args",
-				FailedSocket: failedSocket,
-				FailedHost:   failedHost,
-				Group:        "test_group",
-				DependsOn:    "file_check",
+			totalMem1 := MemUsage{
+				MemLimit:  2048,
+				NumCycles: 3,
+				Action:    "alert",
 			}
 
-			Expect(monitFile.Checks[0]).To(Equal(fileCheck))
+			totalMem2 := MemUsage{
+				MemLimit:  1024,
+				NumCycles: 10,
+				Action:    "restart",
+			}
+
+			processCheck := ProcessCheck{
+				Name:           "test_process",
+				Pidfile:        "/path/to/test/pid",
+				StartProgram:   "/path/to/test/start/command",
+				StopProgram:    "/path/to/test/command with args",
+				FailedSocket:   failedSocket,
+				FailedHost:     failedHost,
+				TotalMemChecks: []MemUsage{totalMem1, totalMem2},
+				Group:          "test_group",
+				DependsOn:      "file_check",
+			}
+
+			Expect(monitFile.Checks[0]).ToNot(Equal(fileCheck))
 			Expect(monitFile.Checks[1]).To(Equal(processCheck))
 		})
 	})
