@@ -1,3 +1,5 @@
 package checks
 
-type Check interface{}
+type Check interface {
+	Run() error
+}

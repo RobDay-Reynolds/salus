@@ -11,7 +11,7 @@ var (
 	fixturesPath string
 )
 
-func TestSky(t *testing.T) {
+func TestMonit(t *testing.T) {
 	fixturesPath = "files"
 
 	RegisterFailHandler(Fail)
