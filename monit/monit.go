@@ -5,57 +5,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/monkeyherder/moirai/checks"
 )
 
 type MonitFile struct {
-	Checks []Check
-}
-
-type Check interface{}
-
-type ProcessCheck struct {
-	Name           string
-	Pidfile        string
-	StartProgram   string
-	StopProgram    string
-	FailedSocket   FailedSocket
-	FailedHost     FailedHost
-	TotalMemChecks []MemUsage
-	Group          string
-	DependsOn      string
-}
-
-type FileCheck struct {
-	Name           string
-	Path           string
-	IfChanged      string
-	FailedSocket   FailedSocket
-	FailedHost     FailedHost
-	TotalMemChecks []MemUsage
-	Group          string
-	DependsOn      string
-}
-
-type FailedSocket struct {
-	SocketFile string
-	Timeout    int
-	NumCycles  int
-	Action     string
-}
-
-type FailedHost struct {
-	Host      string
-	Port      string
-	Protocol  string
-	Timeout   int
-	NumCycles int
-	Action    string
-}
-
-type MemUsage struct {
-	MemLimit  int
-	NumCycles int
-	Action    string
+	Checks []checks.Check
 }
 
 func ReadMonitFile(filepath string) (MonitFile, error) {
@@ -67,7 +22,7 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 
 	lines := strings.Split(string(bytes), "\n")
 
-	checks := []Check{}
+	checks := []checks.Check{}
 
 	i := 0
 	for _, line := range lines {
@@ -94,7 +49,7 @@ func ReadMonitFile(filepath string) (MonitFile, error) {
 	return monitFile, nil
 }
 
-func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
+func createProcessCheck(lines []string, startingIndex int) checks.ProcessCheck {
 	name, lines := captureWithRegex(lines, `check process ([\w"\.]+)`, true)
 
 	totalMemChecks, lines := parseAllTotalMemChecks(lines)
@@ -108,7 +63,7 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 	failedSocket, lines := parseFailedUnixSocket(lines)
 	failedHost, lines := parseFailedHost(lines)
 
-	check := ProcessCheck{
+	check := checks.ProcessCheck{
 		Name:           name,
 		Pidfile:        pidfile,
 		StartProgram:   startProgram,
@@ -123,7 +78,7 @@ func createProcessCheck(lines []string, startingIndex int) ProcessCheck {
 	return check
 }
 
-func createFileCheck(lines []string, startingIndex int) FileCheck {
+func createFileCheck(lines []string, startingIndex int) checks.FileCheck {
 	name, lines := captureWithRegex(lines, `check file ([\w"\.]+)`, true)
 
 	totalMemChecks, lines := parseAllTotalMemChecks(lines)
@@ -136,7 +91,7 @@ func createFileCheck(lines []string, startingIndex int) FileCheck {
 	failedHost, lines := parseFailedHost(lines)
 	failedSocket, lines := parseFailedUnixSocket(lines)
 
-	check := FileCheck{
+	check := checks.FileCheck{
 		Name:           name,
 		Path:           path,
 		IfChanged:      ifChanged,
@@ -150,7 +105,7 @@ func createFileCheck(lines []string, startingIndex int) FileCheck {
 	return check
 }
 
-func parseFailedUnixSocket(lines []string) (FailedSocket, []string) {
+func parseFailedUnixSocket(lines []string) (checks.FailedSocket, []string) {
 	values, lines := parseGroupBlock(
 		lines,
 		"socketFile",
@@ -177,7 +132,7 @@ func parseFailedUnixSocket(lines []string) (FailedSocket, []string) {
 		// Do something
 	}
 
-	fs := FailedSocket{
+	fs := checks.FailedSocket{
 		SocketFile: socketFile,
 		Timeout:    timeoutInt,
 		NumCycles:  numCyclesInt,
@@ -187,7 +142,7 @@ func parseFailedUnixSocket(lines []string) (FailedSocket, []string) {
 	return fs, lines
 }
 
-func parseFailedHost(lines []string) (FailedHost, []string) {
+func parseFailedHost(lines []string) (checks.FailedHost, []string) {
 	values, lines := parseGroupBlock(
 		lines,
 		"host",
@@ -218,7 +173,7 @@ func parseFailedHost(lines []string) (FailedHost, []string) {
 		// Do something
 	}
 
-	fh := FailedHost{
+	fh := checks.FailedHost{
 		Host:      host,
 		Port:      port,
 		Protocol:  protocol,
@@ -230,7 +185,7 @@ func parseFailedHost(lines []string) (FailedHost, []string) {
 	return fh, lines
 }
 
-func parseTotalMem(lines []string) (MemUsage, []string) {
+func parseTotalMem(lines []string) (checks.MemUsage, []string) {
 	totalMemLineEnding, lines := captureWithRegex(lines, `if totalmem > (.*$)`, true)
 
 	tmpLines := []string{totalMemLineEnding}
@@ -248,7 +203,7 @@ func parseTotalMem(lines []string) (MemUsage, []string) {
 		// Do something
 	}
 
-	mu := MemUsage{
+	mu := checks.MemUsage{
 		MemLimit:  memLimitInt,
 		NumCycles: numCyclesInt,
 		Action:    action,
@@ -257,9 +212,9 @@ func parseTotalMem(lines []string) (MemUsage, []string) {
 	return mu, lines
 }
 
-func parseAllTotalMemChecks(lines []string) ([]MemUsage, []string) {
-	var memChecks []MemUsage
-	var memCheck MemUsage
+func parseAllTotalMemChecks(lines []string) ([]checks.MemUsage, []string) {
+	var memChecks []checks.MemUsage
+	var memCheck checks.MemUsage
 
 	for _, line := range lines {
 		memCheckMatch, err := regexp.Match("if totalmem", []byte(line))

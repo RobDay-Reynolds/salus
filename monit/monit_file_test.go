@@ -4,6 +4,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/monkeyherder/moirai/checks"
+
 	. "github.com/monkeyherder/moirai/monit"
 )
 
@@ -14,7 +16,7 @@ var _ = Describe("ReadMonitFile", func() {
 
 			Expect(err).To(BeNil())
 
-			fileCheck := FileCheck{
+			fileCheck := checks.FileCheck{
 				Name:      "file_check",
 				Path:      "/path/to/file",
 				IfChanged: "/path/to/command",
@@ -22,14 +24,14 @@ var _ = Describe("ReadMonitFile", func() {
 				DependsOn: "something_else",
 			}
 
-			failedSocket := FailedSocket{
+			failedSocket := checks.FailedSocket{
 				SocketFile: "/path/to/socket.sock",
 				Timeout:    5,
 				NumCycles:  5,
 				Action:     "restart",
 			}
 
-			failedHost := FailedHost{
+			failedHost := checks.FailedHost{
 				Host:      "1.2.3.4",
 				Port:      "9876",
 				Protocol:  "http",
@@ -38,26 +40,26 @@ var _ = Describe("ReadMonitFile", func() {
 				Action:    "stop",
 			}
 
-			totalMem1 := MemUsage{
+			totalMem1 := checks.MemUsage{
 				MemLimit:  2048,
 				NumCycles: 3,
 				Action:    "alert",
 			}
 
-			totalMem2 := MemUsage{
+			totalMem2 := checks.MemUsage{
 				MemLimit:  1024,
 				NumCycles: 10,
 				Action:    "restart",
 			}
 
-			processCheck := ProcessCheck{
+			processCheck := checks.ProcessCheck{
 				Name:           "test_process",
 				Pidfile:        "/path/to/test/pid",
 				StartProgram:   "/path/to/test/start/command",
 				StopProgram:    "/path/to/test/command with args",
 				FailedSocket:   failedSocket,
 				FailedHost:     failedHost,
-				TotalMemChecks: []MemUsage{totalMem1, totalMem2},
+				TotalMemChecks: []checks.MemUsage{totalMem1, totalMem2},
 				Group:          "test_group",
 				DependsOn:      "file_check",
 			}
@@ -73,14 +75,14 @@ var _ = Describe("ReadMonitFile", func() {
 
 			Expect(err).To(BeNil())
 
-			failedSocket := FailedSocket{
+			failedSocket := checks.FailedSocket{
 				SocketFile: "/path/to/another/socket.sock",
 				Timeout:    60,
 				NumCycles:  15,
 				Action:     "stop",
 			}
 
-			simpleCheck := ProcessCheck{
+			simpleCheck := checks.ProcessCheck{
 				Name:         "test_process",
 				Pidfile:      "/path/to/test/pid",
 				StartProgram: "/path/to/test/start/command",
@@ -99,12 +101,12 @@ var _ = Describe("ReadMonitFile", func() {
 
 			Expect(err).To(BeNil())
 
-			shortCheck := ProcessCheck{
+			shortCheck := checks.ProcessCheck{
 				Name:    "short_process",
 				Pidfile: "/path/to/short/pid",
 			}
 
-			anotherCheck := ProcessCheck{
+			anotherCheck := checks.ProcessCheck{
 				Name:         "another_process",
 				Pidfile:      "/path/to/another/pid",
 				StartProgram: "/path/to/short/start/command",
