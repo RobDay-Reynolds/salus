@@ -84,7 +84,7 @@ func createFileCheck(lines []string, startingIndex int) checks.FileCheck {
 	totalMemChecks, lines := parseAllTotalMemChecks(lines)
 
 	path, lines := captureWithRegex(lines, `with path ([\w"/\.]+)`, true)
-	ifChanged, lines := captureWithRegex(lines, `if changed (.*)$`, true)
+	ifChanged, lines := captureWithRegex(lines, `if changed timestamp then exec (.*)$`, true)
 	group, lines := captureWithRegex(lines, `group (\w+)`, true)
 	dependsOn, lines := captureWithRegex(lines, `depends on (\w+)`, true)
 
@@ -217,6 +217,20 @@ func parseAllTotalMemChecks(lines []string) ([]checks.MemUsage, []string) {
 	var memCheck checks.MemUsage
 
 	for _, line := range lines {
+		newProcessCheck, err := regexp.Match("check process", []byte(line))
+		if err != nil {
+			// Do something
+		}
+
+		newFileCheck, err := regexp.Match("check file", []byte(line))
+		if err != nil {
+			// Do something
+		}
+
+		if newProcessCheck || newFileCheck {
+			break
+		}
+
 		memCheckMatch, err := regexp.Match("if totalmem", []byte(line))
 		if err != nil {
 			// Do something

@@ -64,7 +64,7 @@ var _ = Describe("ReadMonitFile", func() {
 				DependsOn:      "file_check",
 			}
 
-			Expect(monitFile.Checks[0]).ToNot(Equal(fileCheck))
+			Expect(monitFile.Checks[0]).To(Equal(fileCheck))
 			Expect(monitFile.Checks[1]).To(Equal(processCheck))
 		})
 	})

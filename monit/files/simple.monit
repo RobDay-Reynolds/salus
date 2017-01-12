@@ -1,6 +1,6 @@
 check file file_check
   with path /path/to/file
-  if changed /path/to/command
+  if changed timestamp then exec /path/to/command
   group test_group
   depends on something_else
 
