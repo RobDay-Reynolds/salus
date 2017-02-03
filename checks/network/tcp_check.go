@@ -13,7 +13,6 @@ type TcpCheck struct {
 }
 
 func (c TcpCheck) Run() error {
-	fmt.Println(c.Port)
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", c.Port), c.Timeout)
 	if err != nil {
 		return errors.Wrapf(err, "Port %d is not available", c.Port)

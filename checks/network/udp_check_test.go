@@ -98,8 +98,6 @@ func (localTcpUdp *LocalUdpServer) StartUdp(port int, started chan int) error {
 		_, addr, _ := l.ReadFrom(make([]byte, 1))
 		_, err = l.WriteTo([]byte("foo"), addr)
 	}
-
-	fmt.Println(err)
-
+	
 	return nil
 }
