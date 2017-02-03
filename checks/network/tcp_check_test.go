@@ -1,7 +1,7 @@
-package checks_test
+package network_test
 
 import (
-	. "github.com/monkeyherder/moirai/checks"
+	. "github.com/monkeyherder/moirai/checks/network"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -10,23 +10,22 @@ import (
 	"strconv"
 )
 
-var _ = Describe("TcpUdpCheck", func() {
+var _ = Describe("TcpCheck", func() {
 
 	Describe("TCP", func() {
-		var tcpUdpCheck TcpUdpCheck
-		var localTcpServer *LocalTcpServer
+		var tcpUdpCheck TcpCheck
+		var localTcpServer *LocalTcpUdpServer
 
 		BeforeEach(func() {
 			localTcpServer = StartLocalTcpServer()
 
-			tcpUdpCheck = TcpUdpCheck{
-				Protocol: TCP,
+			tcpUdpCheck = TcpCheck{
 				Port:     localTcpServer.Port,
 			}
 		})
 
 		AfterEach(func() {
-			localTcpServer.Close()
+			localTcpServer.CloseTcp()
 		})
 
 		Context("A Port that is rechable and responsive", func() {
@@ -48,34 +47,39 @@ var _ = Describe("TcpUdpCheck", func() {
 		})
 
 	})
+
+
 })
 
-func StartLocalTcpServer() *LocalTcpServer {
-	server := &LocalTcpServer{
+func StartLocalTcpServer() *LocalTcpUdpServer {
+	server := &LocalTcpUdpServer{
+		Protocol: "tcp",
 		HandleRequest: func(conn net.Conn) {
 			conn.Write([]byte("Hello World"))
 			conn.Close()
 		},
 	}
 	started := make(chan int, 1)
-	go server.Start(0, started)
+	go server.StartTcp(0, started)
 	<-started
 
 	return server
 }
 
-type LocalTcpServer struct {
-	Port          int
-	HandleRequest func(conn net.Conn)
-	listener      net.Listener
+type LocalTcpUdpServer struct {
+	Port           int
+	Protocol       string
+	HandleRequest  func(conn net.Conn)
+	listener       net.Listener
+	listenerPacket net.PacketConn
 }
 
-func (localTcp *LocalTcpServer) Close() error {
-	localTcp.HandleRequest = nil
-	return localTcp.listener.Close()
+func (localTcpUdp *LocalTcpUdpServer) CloseTcp() error {
+	localTcpUdp.HandleRequest = nil
+	return localTcpUdp.listener.Close()
 }
 
-func (localTcp *LocalTcpServer) Start(port int, started chan int) error {
+func (localTcpUdp *LocalTcpUdpServer) StartTcp(port int, started chan int) error {
 	defer GinkgoRecover()
 
 	tcpPort := strconv.Itoa(port)
@@ -85,9 +89,9 @@ func (localTcp *LocalTcpServer) Start(port int, started chan int) error {
 		Fail(fmt.Sprintf("Error listening: %v", err.Error()))
 	}
 
-	localTcp.listener = l
+	localTcpUdp.listener = l
 	_, ephemeralPort, err := net.SplitHostPort(l.Addr().String())
-	localTcp.Port, err = strconv.Atoi(ephemeralPort)
+	localTcpUdp.Port, err = strconv.Atoi(ephemeralPort)
 
 	if err != nil {
 		Fail(fmt.Sprintf("Cannot determine port: %v", err.Error()))
@@ -98,8 +102,8 @@ func (localTcp *LocalTcpServer) Start(port int, started chan int) error {
 	started <- 0
 	for {
 		conn, err := l.Accept()
-		if err == nil && localTcp.HandleRequest != nil {
-			localTcp.HandleRequest(conn)
+		if err == nil && localTcpUdp.HandleRequest != nil {
+			localTcpUdp.HandleRequest(conn)
 		}
 	}
 }

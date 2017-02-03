@@ -1,4 +1,4 @@
-package checks
+package network
 
 import (
 	"net"
@@ -7,18 +7,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	TCP int = iota
-	UDP
-)
-
-type TcpUdpCheck struct {
-	Protocol int
+type TcpCheck struct {
 	Port     int
 	Timeout  time.Duration
 }
 
-func (c TcpUdpCheck) Run() error {
+func (c TcpCheck) Run() error {
+	fmt.Println(c.Port)
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", c.Port), c.Timeout)
 	if err != nil {
 		return errors.Wrapf(err, "Port %d is not available", c.Port)
