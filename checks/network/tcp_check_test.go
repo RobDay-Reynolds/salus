@@ -11,43 +11,38 @@ import (
 )
 
 var _ = Describe("TcpCheck", func() {
+	var tcpUdpCheck TcpCheck
+	var localTcpServer *LocalTcpUdpServer
 
-	Describe("TCP", func() {
-		var tcpUdpCheck TcpCheck
-		var localTcpServer *LocalTcpUdpServer
+	BeforeEach(func() {
+		localTcpServer = StartLocalTcpServer()
 
-		BeforeEach(func() {
-			localTcpServer = StartLocalTcpServer()
-
-			tcpUdpCheck = TcpCheck{
-				Port:     localTcpServer.Port,
-			}
-		})
-
-		AfterEach(func() {
-			localTcpServer.CloseTcp()
-		})
-
-		Context("A Port that is rechable and responsive", func() {
-			It("Check should return as healthy", func() {
-				err := tcpUdpCheck.Run()
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		Context("A Port that is not rechable", func() {
-			BeforeEach(func() {
-				tcpUdpCheck.Port = 1
-			})
-
-			It("Check should return as unhealthy", func() {
-				err := tcpUdpCheck.Run()
-				Expect(err).To(HaveOccurred())
-			})
-		})
-
+		tcpUdpCheck = TcpCheck{
+			Port:     localTcpServer.Port,
+		}
 	})
 
+	AfterEach(func() {
+		localTcpServer.CloseTcp()
+	})
+
+	Context("A Port that is rechable and responsive", func() {
+		It("Check should return as healthy", func() {
+			err := tcpUdpCheck.Run()
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
+	Context("A Port that is not rechable", func() {
+		BeforeEach(func() {
+			tcpUdpCheck.Port = 1
+		})
+
+		It("Check should return as unhealthy", func() {
+			err := tcpUdpCheck.Run()
+			Expect(err).To(HaveOccurred())
+		})
+	})
 
 })
 

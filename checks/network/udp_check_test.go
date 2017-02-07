@@ -12,41 +12,51 @@ import (
 )
 
 var _ = Describe("UdpCheck", func() {
-	Describe("UDP", func() {
-		var udpCheck UdpCheck
-		var localUdpServer *LocalUdpServer
+	var udpCheck UdpCheck
+	var localUdpServer *LocalUdpServer
 
-		BeforeEach(func() {
-			localUdpServer = StartLocalUdpServer()
+	BeforeEach(func() {
+		localUdpServer = StartLocalUdpServer()
 
-			udpCheck = UdpCheck{
-				Port:     localUdpServer.Port,
-				Timeout:  2 * time.Second,
-			}
-		})
+		udpCheck = NewUdpCheck(localUdpServer.Port, 2*time.Second)
+	})
 
-		AfterEach(func() {
-			localUdpServer.CloseUdp()
-		})
+	AfterEach(func() {
+		localUdpServer.CloseUdp()
+	})
 
-		Context("A Port that is rechable and responsive", func() {
+	Context("A port that has a udp service listening on it", func() {
+		Context("And is rechable and responsive", func() {
+			BeforeEach(func() {
+				localUdpServer.ShouldRespond = true
+			})
+
 			It("Check should return as healthy", func() {
 				err := udpCheck.Run()
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
 
-		Context("A Port that is not a healthy udp", func() {
+		Context("And is not responsive", func() {
 			BeforeEach(func() {
-				udpCheck.Port = 1
+				localUdpServer.ShouldRespond = false
 			})
-
-			It("Check should return as unhealthy", func() {
+			It("Check should return as not healthy", func() {
 				err := udpCheck.Run()
 				Expect(err).To(HaveOccurred())
 			})
 		})
+	})
 
+	Context("A Port that is not a healthy udp", func() {
+		BeforeEach(func() {
+			udpCheck.Port = 1
+		})
+
+		It("Check should return as unhealthy", func() {
+			err := udpCheck.Run()
+			Expect(err).To(HaveOccurred())
+		})
 	})
 })
 
@@ -64,6 +74,7 @@ func StartLocalUdpServer() *LocalUdpServer {
 type LocalUdpServer struct {
 	Port           int
 	Protocol       string
+	ShouldRespond  bool
 	listenerPacket net.PacketConn
 }
 
@@ -96,8 +107,8 @@ func (localTcpUdp *LocalUdpServer) StartUdp(port int, started chan int) error {
 	started <- 0
 	for {
 		_, addr, _ := l.ReadFrom(make([]byte, 1))
-		_, err = l.WriteTo([]byte("foo"), addr)
+		if localTcpUdp.ShouldRespond {
+			_, err = l.WriteTo([]byte("foo"), addr)
+		}
 	}
-	
-	return nil
 }

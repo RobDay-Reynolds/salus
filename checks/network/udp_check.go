@@ -8,8 +8,19 @@ import (
 )
 
 type UdpCheck struct {
-	Port    int
-	Timeout time.Duration
+	Port     int
+	Timeout  time.Duration
+	Protocol UdpProcotol
+}
+
+type UdpProcotol func(UdpCon) error
+
+type UdpCon interface {
+	Read(b []byte) (n int, err error)
+	Write(b []byte) (n int, err error)
+	SetDeadline(t time.Time) error
+	SetReadDeadline(t time.Time) error
+	SetWriteDeadline(t time.Time) error
 }
 
 func (c UdpCheck) Run() error {
@@ -17,16 +28,25 @@ func (c UdpCheck) Run() error {
 	if err != nil {
 		return errors.Wrapf(err, "Port %d is not available", c.Port)
 	}
-
-	conn.SetReadDeadline(time.Now().Add(c.Timeout))
-	conn.Write([]byte(""))
-
-	_, err = conn.Read(make([]byte, 1))
-	if err != nil {
-		return errors.Wrapf(err, "Timed out on udp response", c.Port)
-	}
-
 	defer conn.Close()
 
-	return nil
+	return c.Protocol(conn)
+}
+
+func NewUdpCheck(port int, timeout time.Duration) UdpCheck {
+	return UdpCheck{
+		Port:    port,
+		Timeout: timeout,
+		Protocol: func(udpConn UdpCon) error {
+			udpConn.SetReadDeadline(time.Now().Add(timeout))
+			udpConn.Write([]byte(""))
+
+			_, err := udpConn.Read(make([]byte, 1))
+			if err != nil {
+				return errors.Wrapf(err, "Timed out on udp response", port)
+			}
+
+			return nil
+		},
+	}
 }
