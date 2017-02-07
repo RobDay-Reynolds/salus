@@ -92,8 +92,6 @@ func (localTcpUdp *LocalTcpUdpServer) StartTcp(port int, started chan int) error
 		Fail(fmt.Sprintf("Cannot determine port: %v", err.Error()))
 	}
 
-	fmt.Println("Listening on " + "127.0.0.1:" + ephemeralPort)
-
 	started <- 0
 	for {
 		conn, err := l.Accept()
