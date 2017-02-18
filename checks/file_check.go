@@ -3,14 +3,11 @@ package checks
 import "os"
 
 type FileCheck struct {
-	Name           string
-	Path           string
-	IfChanged      string
-	FailedSocket   FailedSocket
-	FailedHost     FailedHost
-	TotalMemChecks []MemUsage
-	Group          string
-	DependsOn      string
+	Name      string
+	Path      string
+	IfChanged string
+	Group     string
+	DependsOn string
 }
 
 func (f FileCheck) Run() error {

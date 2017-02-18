@@ -81,25 +81,17 @@ func createProcessCheck(lines []string, startingIndex int) checks.ProcessCheck {
 func createFileCheck(lines []string, startingIndex int) checks.FileCheck {
 	name, lines := captureWithRegex(lines, `check file ([\w"\.]+)`, true)
 
-	totalMemChecks, lines := parseAllTotalMemChecks(lines)
-
 	path, lines := captureWithRegex(lines, `with path ([\w"/\.]+)`, true)
 	ifChanged, lines := captureWithRegex(lines, `if changed timestamp then exec (.*)$`, true)
 	group, lines := captureWithRegex(lines, `group (\w+)`, true)
 	dependsOn, lines := captureWithRegex(lines, `depends on (\w+)`, true)
 
-	failedHost, lines := parseFailedHost(lines)
-	failedSocket, lines := parseFailedUnixSocket(lines)
-
 	check := checks.FileCheck{
-		Name:           name,
-		Path:           path,
-		IfChanged:      ifChanged,
-		FailedSocket:   failedSocket,
-		FailedHost:     failedHost,
-		TotalMemChecks: totalMemChecks,
-		Group:          group,
-		DependsOn:      dependsOn,
+		Name:      name,
+		Path:      path,
+		IfChanged: ifChanged,
+		Group:     group,
+		DependsOn: dependsOn,
 	}
 
 	return check
