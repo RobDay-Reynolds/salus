@@ -19,7 +19,7 @@ type IcmpCheck struct {
 	Timeout time.Duration
 }
 
-func (icmpCheck IcmpCheck) Check() error {
+func (icmpCheck IcmpCheck) Run() error {
 	// Use a non-privileged datagram-oriented ICMP: https://lwn.net/Articles/420800/
 	packetConn, err := icmp.ListenPacket("udp4", "0.0.0.0")
 

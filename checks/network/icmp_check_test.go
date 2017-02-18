@@ -19,7 +19,7 @@ var _ = Describe("IcmpCheck", func() {
 	})
 	Context("Given a valid address", func() {
 		It("should not return an error", func() {
-			err := icmpCheck.Check()
+			err := icmpCheck.Run()
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -28,7 +28,7 @@ var _ = Describe("IcmpCheck", func() {
 				icmpCheck.Address = "test.com"
 			})
 			It("should return an error", func() {
-				err := icmpCheck.Check()
+				err := icmpCheck.Run()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("read udp 0.0.0.0:0: i/o timeout"))
 			})
@@ -43,7 +43,7 @@ var _ = Describe("IcmpCheck", func() {
 		})
 
 		It("should return an error", func() {
-			err := icmpCheck.Check()
+			err := icmpCheck.Run()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("lookup testing-an-invalid-address.invalid: no such host"))
 		})
