@@ -1,9 +1,9 @@
 package network
 
 import (
-	"time"
-	"net"
 	"github.com/pkg/errors"
+	"net"
+	"time"
 )
 
 type UnixSocketCheck struct {

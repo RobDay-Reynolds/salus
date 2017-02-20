@@ -3,10 +3,10 @@ package network_test
 import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net"
-	"fmt"
 	"strconv"
 )
 
@@ -18,7 +18,7 @@ var _ = Describe("TcpCheck", func() {
 		localTcpServer = StartLocalTcpServer()
 
 		tcpUdpCheck = TcpCheck{
-			Port:     localTcpServer.Port,
+			Port: localTcpServer.Port,
 		}
 	})
 

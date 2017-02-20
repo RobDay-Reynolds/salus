@@ -3,12 +3,12 @@ package network_test
 import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 	"net"
 	"strconv"
-	"fmt"
+	"time"
 )
 
 var _ = Describe("UdpCheck", func() {

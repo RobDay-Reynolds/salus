@@ -1,10 +1,10 @@
 package network
 
 import (
-	"net"
 	"fmt"
-	"time"
 	"github.com/pkg/errors"
+	"net"
+	"time"
 )
 
 type UdpCheck struct {

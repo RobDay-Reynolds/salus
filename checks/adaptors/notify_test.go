@@ -3,11 +3,11 @@ package adaptors_test
 import (
 	. "github.com/monkeyherder/moirai/checks/adaptors"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"errors"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors/adaptorsfakes"
-	"errors"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Notify", func() {

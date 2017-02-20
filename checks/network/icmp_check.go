@@ -1,15 +1,14 @@
 package network
 
 import (
-	"golang.org/x/net/icmp"
-	"os"
-	"net"
-	"fmt"
-	"golang.org/x/net/ipv4"
-	"time"
 	"errors"
+	"fmt"
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
+	"net"
+	"os"
+	"time"
 )
-
 
 // http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
 const ICMP_PROTOCOL int = 1
@@ -31,7 +30,7 @@ func (icmpCheck IcmpCheck) Run() error {
 	icmpRequest := icmp.Message{
 		Type: ipv4.ICMPTypeEcho, Code: 0,
 		Body: &icmp.Echo{
-			ID:   os.Getpid() & 0xffff, Seq: 1,
+			ID: os.Getpid() & 0xffff, Seq: 1,
 			Data: []byte{},
 		},
 	}

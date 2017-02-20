@@ -1,15 +1,15 @@
 package network
 
 import (
-	"net"
 	"fmt"
-	"time"
 	"github.com/pkg/errors"
+	"net"
+	"time"
 )
 
 type TcpCheck struct {
-	Port     int
-	Timeout  time.Duration
+	Port    int
+	Timeout time.Duration
 }
 
 func (c TcpCheck) Run() error {

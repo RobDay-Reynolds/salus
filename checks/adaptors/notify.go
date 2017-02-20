@@ -1,8 +1,8 @@
 package adaptors
 
 import (
-	"github.com/monkeyherder/moirai/checks"
 	"fmt"
+	"github.com/monkeyherder/moirai/checks"
 )
 
 func NewNotifierLogger() checks.CheckAdaptor {

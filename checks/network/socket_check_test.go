@@ -3,10 +3,10 @@ package network_test
 import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -20,7 +20,7 @@ var _ = Describe("SocketCheck", func() {
 		localSocketServer = StartLocalUnixSocketServer()
 
 		unixSocketCheck = UnixSocketCheck{
-			SocketFile:     localSocketServer.Socket,
+			SocketFile: localSocketServer.Socket,
 		}
 	})
 
