@@ -4,10 +4,11 @@ import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
 	"fmt"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net"
 	"strconv"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("TcpCheck", func() {
@@ -28,7 +29,7 @@ var _ = Describe("TcpCheck", func() {
 
 	Context("A Port that is rechable and responsive", func() {
 		It("Check should return as healthy", func() {
-			err := tcpUdpCheck.Run()
+			_, _, err := tcpUdpCheck.Run()
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -39,7 +40,7 @@ var _ = Describe("TcpCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			err := tcpUdpCheck.Run()
+			_, _, err := tcpUdpCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

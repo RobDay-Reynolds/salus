@@ -25,7 +25,7 @@ var _ = Describe("FileCheck", func() {
 					Path: file.Name(),
 				}
 
-				err = check.Run()
+				_, _, err = check.Run()
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -37,7 +37,7 @@ var _ = Describe("FileCheck", func() {
 					Path: "/path/to/unknown/file",
 				}
 
-				err := check.Run()
+				_, _, err := check.Run()
 				Expect(err).To(HaveOccurred())
 			})
 		})

@@ -2,6 +2,7 @@ package adaptors
 
 import (
 	"fmt"
+
 	"github.com/monkeyherder/moirai/checks"
 )
 
@@ -17,14 +18,14 @@ type Notifier interface {
 
 func Notify(notifier Notifier) checks.CheckAdaptor {
 	return func(check checks.Check) checks.Check {
-		return checks.CheckFunc(func() error {
+		return checks.CheckFunc(func() (string, string, error) {
 			notifier.BeforeCheck(check)
-			err := check.Run()
+			_, _, err := check.Run()
 			if err != nil {
 				notifier.OnError(check, err)
 			}
 			notifier.AfterCheck(check)
-			return err
+			return "", "", err
 		})
 	}
 }

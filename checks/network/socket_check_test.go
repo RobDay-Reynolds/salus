@@ -4,11 +4,12 @@ import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
 	"fmt"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net"
 	"os"
 	"path/filepath"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("SocketCheck", func() {
@@ -30,7 +31,7 @@ var _ = Describe("SocketCheck", func() {
 
 	Context("A Socket that is accessible and responsive", func() {
 		It("Check should return as healthy", func() {
-			err := unixSocketCheck.Run()
+			_, _, err := unixSocketCheck.Run()
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -41,7 +42,7 @@ var _ = Describe("SocketCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			err := unixSocketCheck.Run()
+			_, _, err := unixSocketCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

@@ -2,9 +2,10 @@ package network
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type TcpCheck struct {
@@ -12,13 +13,13 @@ type TcpCheck struct {
 	Timeout time.Duration
 }
 
-func (c TcpCheck) Run() error {
+func (c TcpCheck) Run() (string, string, error) {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", c.Port), c.Timeout)
 	if err != nil {
-		return errors.Wrapf(err, "Port %d is not available", c.Port)
+		return "", "", errors.Wrapf(err, "Port %d is not available", c.Port)
 	}
 
 	defer conn.Close()
 
-	return nil
+	return "", "", nil
 }

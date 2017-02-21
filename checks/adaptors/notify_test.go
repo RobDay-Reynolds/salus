@@ -4,6 +4,7 @@ import (
 	. "github.com/monkeyherder/moirai/checks/adaptors"
 
 	"errors"
+
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors/adaptorsfakes"
 	. "github.com/onsi/ginkgo"
@@ -24,8 +25,8 @@ var _ = Describe("Notify", func() {
 		var checkWithNotifier checks.Check
 
 		BeforeEach(func() {
-			successCheckFn = checks.CheckFunc(func() error {
-				return nil
+			successCheckFn = checks.CheckFunc(func() (string, string, error) {
+				return "", "", nil
 			})
 			checkWithNotifier = notifier(successCheckFn)
 		})
@@ -47,8 +48,8 @@ var _ = Describe("Notify", func() {
 		Context("A failing check", func() {
 
 			BeforeEach(func() {
-				successCheckFn := checks.CheckFunc(func() error {
-					return errors.New("some error")
+				successCheckFn := checks.CheckFunc(func() (string, string, error) {
+					return "", "", errors.New("some error")
 				})
 				checkWithNotifier = notifier(successCheckFn)
 			})

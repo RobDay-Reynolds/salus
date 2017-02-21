@@ -4,11 +4,12 @@ import (
 	. "github.com/monkeyherder/moirai/checks/network"
 
 	"fmt"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"net"
 	"strconv"
 	"time"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("UdpCheck", func() {
@@ -32,7 +33,7 @@ var _ = Describe("UdpCheck", func() {
 			})
 
 			It("Check should return as healthy", func() {
-				err := udpCheck.Run()
+				_, _, err := udpCheck.Run()
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -42,7 +43,7 @@ var _ = Describe("UdpCheck", func() {
 				localUdpServer.ShouldRespond = false
 			})
 			It("Check should return as not healthy", func() {
-				err := udpCheck.Run()
+				_, _, err := udpCheck.Run()
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -54,7 +55,7 @@ var _ = Describe("UdpCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			err := udpCheck.Run()
+			_, _, err := udpCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

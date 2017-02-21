@@ -2,9 +2,10 @@ package network
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type UdpCheck struct {
@@ -23,14 +24,14 @@ type UdpCon interface {
 	SetWriteDeadline(t time.Time) error
 }
 
-func (c UdpCheck) Run() error {
+func (c UdpCheck) Run() (string, string, error) {
 	conn, err := net.DialTimeout("udp", fmt.Sprintf("127.0.0.1:%d", c.Port), c.Timeout)
 	if err != nil {
-		return errors.Wrapf(err, "Port %d is not available", c.Port)
+		return "", "", errors.Wrapf(err, "Port %d is not available", c.Port)
 	}
 	defer conn.Close()
 
-	return c.Protocol(conn)
+	return "", "", c.Protocol(conn)
 }
 
 func NewUdpCheck(port int, timeout time.Duration) UdpCheck {

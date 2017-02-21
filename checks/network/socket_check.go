@@ -1,9 +1,10 @@
 package network
 
 import (
-	"github.com/pkg/errors"
 	"net"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type UnixSocketCheck struct {
@@ -11,12 +12,12 @@ type UnixSocketCheck struct {
 	Timeout    time.Duration
 }
 
-func (u UnixSocketCheck) Run() error {
+func (u UnixSocketCheck) Run() (string, string, error) {
 	c, err := net.Dial("unix", u.SocketFile)
 	if err != nil {
-		return errors.Wrap(err, "Unable to connect to unix socket file")
+		return "", "", errors.Wrap(err, "Unable to connect to unix socket file")
 	}
 	defer c.Close()
 
-	return nil
+	return "", "", nil
 }
