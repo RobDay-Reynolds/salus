@@ -2,12 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/jessevdk/go-flags"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors"
 	"github.com/monkeyherder/moirai/checks/network"
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +18,7 @@ const TAG string = "checksd"
 const DEFAULT_CHECKS_POLL_TIME time.Duration = 30 * time.Second
 
 type ChecksdConfig struct {
-	ChecksPollTime time.Duration `json:"checksPollTime"`
+	ChecksPollTime time.Duration       `json:"checksPollTime"`
 	IcmpChecks     []network.IcmpCheck `json:"icmpChecks"`
 }
 
@@ -65,7 +65,7 @@ func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
 		return nil, err
 	}
 
-	if config.ChecksPollTime <= 0*time.Second {
+	if config.ChecksPollTime <= 0 {
 		config.ChecksPollTime = DEFAULT_CHECKS_POLL_TIME
 	}
 

@@ -12,8 +12,5 @@ if [[ $reformatted_packages = *[![:space:]]* ]]; then
   exit 1
 fi
 
-echo -e "\n Running unit tests..."
-$bin/env ginkgo -r $race -trace -skipPackage="main,vendor" $@
-
-# echo -e "\n Building docs example..."
-# $bin/go build -o $bin/../out/example github.com/monkeyherder/moirai/docs/
+echo -e "\n Running integration tests..."
+$bin/env ginkgo -r $race -trace main
