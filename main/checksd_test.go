@@ -27,6 +27,7 @@ var _ = Describe("Checksd", func() {
 
 		BeforeEach(func() {
 			config := ChecksdConfig{
+				ChecksPollTime: 1 * time.Second,
 				IcmpChecks: []network.IcmpCheck{
 					{
 						Address: "www.google.com",
@@ -82,7 +83,7 @@ var _ = Describe("Checksd", func() {
 		It("Should error", func() {
 			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ShouldNot(HaveOccurred())
-			Eventually(session, 10).Should(gbytes.Say("unable to configure checksd with config file"))
+			Eventually(session.Err, 10).Should(gbytes.Say("unable to configure checksd with config file"))
 		})
 	})
 })

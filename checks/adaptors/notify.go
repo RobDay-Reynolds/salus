@@ -1,13 +1,15 @@
 package adaptors
 
 import (
-	"fmt"
-
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/monkeyherder/moirai/checks"
+	"reflect"
 )
 
-func NewNotifierLogger() checks.CheckAdaptor {
-	return Notify(notifierLogger{})
+func NewNotifierLogger(logger boshlog.Logger) checks.CheckAdaptor {
+	return Notify(notifierLogger{
+		Logger: logger,
+	})
 }
 
 type Notifier interface {
@@ -30,16 +32,18 @@ func Notify(notifier Notifier) checks.CheckAdaptor {
 	}
 }
 
-type notifierLogger struct{}
-
-func (notifierLogger) BeforeCheck(check checks.Check) {
-	fmt.Println("Before Check ran")
+type notifierLogger struct {
+	Logger boshlog.Logger
 }
 
-func (notifierLogger) AfterCheck(check checks.Check) {
-	fmt.Println("After Check ran")
+func (n notifierLogger) BeforeCheck(check checks.Check) {
+	n.Logger.Debug(reflect.TypeOf(check).Name(), "Before Check ran")
 }
 
-func (notifierLogger) OnError(chgeck checks.Check, err error) {
-	fmt.Println(fmt.Sprintf("Error occurred: %v", err))
+func (n notifierLogger) AfterCheck(check checks.Check) {
+	n.Logger.Debug(reflect.TypeOf(check).Name(), "After Check ran")
+}
+
+func (n notifierLogger) OnError(check checks.Check, err error) {
+	n.Logger.Error(reflect.TypeOf(check).Name(), "Error occurred", err)
 }
