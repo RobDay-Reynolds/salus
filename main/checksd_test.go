@@ -105,6 +105,7 @@ var _ = Describe("Checksd", func() {
 			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ShouldNot(HaveOccurred())
 			Eventually(session.Err, 10).Should(gbytes.Say("unable to configure checksd with config file"))
+			Eventually(session.ExitCode, 3).Should(Equal(1))
 		})
 	})
 })

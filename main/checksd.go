@@ -37,12 +37,14 @@ func main() {
 	opts := &ConfigOpts{}
 	_, err := flags.ParseArgs(opts, os.Args[1:])
 	if err != nil {
+		exitCode = 1
 		return
 	}
 
 	config, err := parseConfig(opts)
 	if err != nil {
 		asyncLog.Error(TAG, "unable to configure checksd with config file: ", err.Error())
+		exitCode = 1
 		return
 	}
 
