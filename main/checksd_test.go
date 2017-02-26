@@ -18,15 +18,28 @@ import (
 )
 
 var _ = Describe("Checksd", func() {
+
+	act := func(config ChecksdConfig) *exec.Cmd {
+		configJson, err := json.Marshal(config)
+		Expect(err).ToNot(HaveOccurred())
+
+		tempConfigFile, err := fileutil.TempFile(os.TempDir(), "checksd", "yml")
+		Expect(err).ToNot(HaveOccurred())
+
+		err = ioutil.WriteFile(tempConfigFile.Name(), configJson, os.ModePerm)
+		Expect(err).ToNot(HaveOccurred())
+		return exec.Command(pathToChecksd, fmt.Sprintf("--config=%s", tempConfigFile.Name()))
+	}
+
 	AfterEach(func() {
 		gexec.KillAndWait(10)
 	})
 
 	Context("Given valid config", func() {
-		var command *exec.Cmd
+		var config ChecksdConfig
 
 		BeforeEach(func() {
-			config := ChecksdConfig{
+			config = ChecksdConfig{
 				ChecksPollTime: 1 * time.Second,
 				IcmpChecks: []network.IcmpCheck{
 					{
@@ -35,27 +48,35 @@ var _ = Describe("Checksd", func() {
 					},
 				},
 			}
-
-			configJson, err := json.Marshal(config)
-			Expect(err).ToNot(HaveOccurred())
-
-			tempConfigFile, err := fileutil.TempFile(os.TempDir(), "checksd", "yml")
-			Expect(err).ToNot(HaveOccurred())
-
-			err = ioutil.WriteFile(tempConfigFile.Name(), configJson, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred())
-
-			command = exec.Command(pathToChecksd, fmt.Sprintf("--config=%s", tempConfigFile.Name()))
 		})
 
 		It("Should run health check", func() {
+			command := act(config)
+
 			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ShouldNot(HaveOccurred())
 			Eventually(session, 10).Should(gbytes.Say("After Check ran"))
 		})
 
+		Context("Check Poll config is not provided", func() {
+			BeforeEach(func() {
+				config.ChecksPollTime = 0
+			})
+
+			It("Should default to 30 second value", func() {
+				command := act(config)
+
+				session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+				Expect(err).ShouldNot(HaveOccurred())
+				Consistently(session, 25).ShouldNot(gbytes.Say("Before Check ran"))
+				Eventually(session, 10).Should(gbytes.Say("Before Check ran"))
+			})
+		})
+
 		Context("Sending a SIGTERM process signal", func() {
 			It("should handle signal and exit gracefully", func() {
+				command := act(config)
+
 				session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 				Expect(err).ShouldNot(HaveOccurred())
 				Eventually(session, 10).Should(gbytes.Say("After Check ran"))

@@ -15,6 +15,7 @@ import (
 )
 
 const TAG string = "checksd"
+const DEFAULT_CHECKS_POLL_TIME time.Duration = 30 * time.Second
 
 type ChecksdConfig struct {
 	ChecksPollTime time.Duration `json:"checksPollTime"`
@@ -45,9 +46,7 @@ func main() {
 		return
 	}
 
-	exitCode = startDaemon(asyncLog, ChecksdConfig{
-		IcmpChecks: config.IcmpChecks,
-	})
+	exitCode = startDaemon(asyncLog, config)
 }
 
 func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
@@ -66,15 +65,19 @@ func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
 		return nil, err
 	}
 
+	if config.ChecksPollTime <= 0*time.Second {
+		config.ChecksPollTime = DEFAULT_CHECKS_POLL_TIME
+	}
+
 	return config, nil
 }
 
-func startDaemon(logger boshlog.Logger, config ChecksdConfig) int {
+func startDaemon(logger boshlog.Logger, config *ChecksdConfig) int {
 	sigChannel := make(chan os.Signal, 8)
 	signal.Notify(sigChannel, syscall.SIGTERM, os.Interrupt, os.Kill)
 
 	for {
-		time.Sleep(1 * time.Second)
+		time.Sleep(config.ChecksPollTime)
 		select {
 		case sig := <-sigChannel:
 			logger.Debug(TAG, "sig received: %v", sig)
