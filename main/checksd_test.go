@@ -6,7 +6,7 @@ import (
 	"github.com/cznic/fileutil"
 	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/monkeyherder/moirai/checks/network"
-	. "github.com/monkeyherder/moirai/main"
+	"github.com/monkeyherder/moirai/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -19,7 +19,7 @@ import (
 
 var _ = Describe("Checksd", func() {
 
-	act := func(config ChecksdConfig) *exec.Cmd {
+	act := func(config config.ChecksdConfig) *exec.Cmd {
 		configJson, err := json.Marshal(config)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -36,10 +36,10 @@ var _ = Describe("Checksd", func() {
 	})
 
 	Context("Given valid config", func() {
-		var config ChecksdConfig
+		var checksdConfig config.ChecksdConfig
 
 		BeforeEach(func() {
-			config = ChecksdConfig{
+			checksdConfig = config.ChecksdConfig{
 				ChecksPollTime: 1 * time.Second,
 				IcmpChecks: []network.IcmpCheck{
 					{
@@ -51,7 +51,7 @@ var _ = Describe("Checksd", func() {
 		})
 
 		It("Should run health check", func() {
-			command := act(config)
+			command := act(checksdConfig)
 
 			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ShouldNot(HaveOccurred())
@@ -60,11 +60,11 @@ var _ = Describe("Checksd", func() {
 
 		Context("Check Poll config is not provided", func() {
 			BeforeEach(func() {
-				config.ChecksPollTime = 0
+				checksdConfig.ChecksPollTime = 0
 			})
 
 			It("Should default to 30 second value", func() {
-				command := act(config)
+				command := act(checksdConfig)
 
 				session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 				Expect(err).ShouldNot(HaveOccurred())
@@ -75,7 +75,7 @@ var _ = Describe("Checksd", func() {
 
 		Context("Sending a SIGTERM process signal", func() {
 			It("should handle signal and exit gracefully", func() {
-				command := act(config)
+				command := act(checksdConfig)
 
 				session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 				Expect(err).ShouldNot(HaveOccurred())

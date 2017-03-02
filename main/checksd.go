@@ -7,7 +7,7 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors"
-	"github.com/monkeyherder/moirai/checks/network"
+	"github.com/monkeyherder/moirai/config"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,11 +16,6 @@ import (
 
 const TAG string = "checksd"
 const DEFAULT_CHECKS_POLL_TIME time.Duration = 30 * time.Second
-
-type ChecksdConfig struct {
-	ChecksPollTime time.Duration       `json:"checksPollTime"`
-	IcmpChecks     []network.IcmpCheck `json:"icmpChecks"`
-}
 
 type ConfigOpts struct {
 	FilePath string `short:"c" long:"config" description:"path to checksd config" value-name:"FILE"`
@@ -43,7 +38,7 @@ func main() {
 
 	config, err := parseConfig(opts)
 	if err != nil {
-		asyncLog.Error(TAG, "unable to configure checksd with config file: ", err.Error())
+		asyncLog.Error(TAG, "unable to configure checksd with config file", err)
 		exitCode = 1
 		return
 	}
@@ -51,7 +46,7 @@ func main() {
 	exitCode = startDaemon(asyncLog, config)
 }
 
-func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
+func parseConfig(opts *ConfigOpts) (*config.ChecksdConfig, error) {
 	configFile, err := os.Open(opts.FilePath)
 	if err != nil {
 		return nil, err
@@ -61,7 +56,7 @@ func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
 		return nil, err
 	}
 
-	config := &ChecksdConfig{}
+	config := &config.ChecksdConfig{}
 	err = json.Unmarshal(configContents, config)
 	if err != nil {
 		return nil, err
@@ -74,7 +69,7 @@ func parseConfig(opts *ConfigOpts) (*ChecksdConfig, error) {
 	return config, nil
 }
 
-func startDaemon(logger boshlog.Logger, config *ChecksdConfig) int {
+func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	sigChannel := make(chan os.Signal, 8)
 	signal.Notify(sigChannel, syscall.SIGTERM, os.Interrupt, os.Kill)
 
