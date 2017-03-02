@@ -25,8 +25,8 @@ var _ = Describe("Notify", func() {
 		var checkWithNotifier checks.Check
 
 		BeforeEach(func() {
-			successCheckFn = checks.CheckFunc(func() (string, string, error) {
-				return "", "", nil
+			successCheckFn = checks.CheckFunc(func() (checks.CheckInfo, error) {
+				return checks.CheckInfo{}, nil
 			})
 			checkWithNotifier = notifier(successCheckFn)
 		})
@@ -48,8 +48,8 @@ var _ = Describe("Notify", func() {
 		Context("A failing check", func() {
 
 			BeforeEach(func() {
-				successCheckFn := checks.CheckFunc(func() (string, string, error) {
-					return "", "", errors.New("some error")
+				successCheckFn := checks.CheckFunc(func() (checks.CheckInfo, error) {
+					return checks.CheckInfo{}, errors.New("some error")
 				})
 				checkWithNotifier = notifier(successCheckFn)
 			})

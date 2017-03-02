@@ -33,7 +33,7 @@ var _ = Describe("UdpCheck", func() {
 			})
 
 			It("Check should return as healthy", func() {
-				_, _, err := udpCheck.Run()
+				_, err := udpCheck.Run()
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -43,7 +43,7 @@ var _ = Describe("UdpCheck", func() {
 				localUdpServer.ShouldRespond = false
 			})
 			It("Check should return as not healthy", func() {
-				_, _, err := udpCheck.Run()
+				_, err := udpCheck.Run()
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -55,7 +55,7 @@ var _ = Describe("UdpCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			_, _, err := udpCheck.Run()
+			_, err := udpCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

@@ -10,8 +10,8 @@ type FileCheck struct {
 	DependsOn string
 }
 
-func (f FileCheck) Run() (string, string, error) {
+func (f FileCheck) Run() (CheckInfo, error) {
 	_, err := os.Stat(f.Path)
 
-	return "", "", err
+	return CheckInfo{}, err
 }

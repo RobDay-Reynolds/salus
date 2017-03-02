@@ -29,7 +29,7 @@ var _ = Describe("TcpCheck", func() {
 
 	Context("A Port that is rechable and responsive", func() {
 		It("Check should return as healthy", func() {
-			_, _, err := tcpUdpCheck.Run()
+			_, err := tcpUdpCheck.Run()
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -40,7 +40,7 @@ var _ = Describe("TcpCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			_, _, err := tcpUdpCheck.Run()
+			_, err := tcpUdpCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

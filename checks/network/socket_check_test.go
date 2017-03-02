@@ -31,7 +31,7 @@ var _ = Describe("SocketCheck", func() {
 
 	Context("A Socket that is accessible and responsive", func() {
 		It("Check should return as healthy", func() {
-			_, _, err := unixSocketCheck.Run()
+			_, err := unixSocketCheck.Run()
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -42,7 +42,7 @@ var _ = Describe("SocketCheck", func() {
 		})
 
 		It("Check should return as unhealthy", func() {
-			_, _, err := unixSocketCheck.Run()
+			_, err := unixSocketCheck.Run()
 			Expect(err).To(HaveOccurred())
 		})
 	})

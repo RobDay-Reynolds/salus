@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
+	"github.com/monkeyherder/moirai/checks"
 )
 
 type TcpCheck struct {
@@ -13,13 +15,13 @@ type TcpCheck struct {
 	Timeout time.Duration
 }
 
-func (c TcpCheck) Run() (string, string, error) {
+func (c TcpCheck) Run() (checks.CheckInfo, error) {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", c.Port), c.Timeout)
 	if err != nil {
-		return "", "", errors.Wrapf(err, "Port %d is not available", c.Port)
+		return checks.CheckInfo{}, errors.Wrapf(err, "Port %d is not available", c.Port)
 	}
 
 	defer conn.Close()
 
-	return "", "", nil
+	return checks.CheckInfo{}, nil
 }

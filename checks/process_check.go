@@ -1,5 +1,5 @@
 package checks
 
-func (p ProcessCheck) Run() (string, string, error) {
-	return "", "", nil
+func (p ProcessCheck) Run() (CheckInfo, error) {
+	return CheckInfo{}, nil
 }

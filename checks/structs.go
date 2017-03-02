@@ -33,3 +33,8 @@ type MemUsage struct {
 	NumCycles int
 	Action    string
 }
+
+type CheckInfo struct {
+	Status string
+	Note   string
+}

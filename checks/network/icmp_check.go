@@ -9,6 +9,8 @@ import (
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
+
+	"github.com/monkeyherder/moirai/checks"
 )
 
 // http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
@@ -19,12 +21,12 @@ type IcmpCheck struct {
 	Timeout time.Duration
 }
 
-func (icmpCheck IcmpCheck) Run() (string, string, error) {
+func (icmpCheck IcmpCheck) Run() (checks.CheckInfo, error) {
 	// Use a non-privileged datagram-oriented ICMP: https://lwn.net/Articles/420800/
 	packetConn, err := icmp.ListenPacket("udp4", "0.0.0.0")
 
 	if err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 	defer packetConn.Close()
 
@@ -37,16 +39,16 @@ func (icmpCheck IcmpCheck) Run() (string, string, error) {
 	}
 	icmpRequestBody, err := icmpRequest.Marshal(nil)
 	if err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 
 	ipAddr, err := getAddr(icmpCheck.Address)
 	if err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 
 	if _, err := packetConn.WriteTo(icmpRequestBody, ipAddr); err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 
 	deadline := time.Now().Add(icmpCheck.Timeout)
@@ -55,18 +57,18 @@ func (icmpCheck IcmpCheck) Run() (string, string, error) {
 	readBuffer := make([]byte, 1500)
 	responseReadLen, _, err := packetConn.ReadFrom(readBuffer)
 	if err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 
 	icmpResponseMessage, err := icmp.ParseMessage(ICMP_PROTOCOL, readBuffer[:responseReadLen])
 	if err != nil {
-		return "", "", err
+		return checks.CheckInfo{}, err
 	}
 	switch icmpResponseMessage.Type {
 	case ipv4.ICMPTypeEchoReply:
-		return "", "", nil
+		return checks.CheckInfo{}, nil
 	default:
-		return "", "", errors.New(fmt.Sprintf("got %+v; expected echo reply", icmpResponseMessage))
+		return checks.CheckInfo{}, errors.New(fmt.Sprintf("got %+v; expected echo reply", icmpResponseMessage))
 	}
 }
 

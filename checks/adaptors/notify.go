@@ -1,9 +1,10 @@
 package adaptors
 
 import (
+	"reflect"
+
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/monkeyherder/moirai/checks"
-	"reflect"
 )
 
 func NewNotifierLogger(logger boshlog.Logger) checks.CheckAdaptor {
@@ -20,14 +21,14 @@ type Notifier interface {
 
 func Notify(notifier Notifier) checks.CheckAdaptor {
 	return func(check checks.Check) checks.Check {
-		return checks.CheckFunc(func() (string, string, error) {
+		return checks.CheckFunc(func() (checks.CheckInfo, error) {
 			notifier.BeforeCheck(check)
-			_, _, err := check.Run()
+			_, err := check.Run()
 			if err != nil {
 				notifier.OnError(check, err)
 			}
 			notifier.AfterCheck(check)
-			return "", "", err
+			return checks.CheckInfo{}, err
 		})
 	}
 }
