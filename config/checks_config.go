@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/network"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -44,19 +45,23 @@ func (c *ChecksdConfig) UnmarshalJSON(b []byte) error {
 	}
 
 	for _, checkConfig := range c.ChecksConfig {
-		check := CheckToTypeMapping[checkConfig.Type]()
+		checkForTypeFn, found := CheckToTypeMapping[checkConfig.Type]
+		if !found {
+			return errors.Errorf("Check config with type: '%s' is not a valid check", checkConfig.Type)
+		}
+		checkForType := checkForTypeFn()
 
 		checkConfigProperties, err := json.Marshal(checkConfig.CheckProperties)
 		if err != nil {
 			return err
 		}
 
-		err = json.Unmarshal(checkConfigProperties, check)
+		err = json.Unmarshal(checkConfigProperties, checkForType)
 		if err != nil {
 			return err
 		}
 
-		c.Checks = append(c.Checks, check)
+		c.Checks = append(c.Checks, checkForType)
 	}
 
 	return nil

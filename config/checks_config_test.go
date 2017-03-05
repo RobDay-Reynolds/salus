@@ -4,7 +4,6 @@ import (
 	. "github.com/monkeyherder/moirai/config"
 
 	"encoding/json"
-	"fmt"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/network"
 	. "github.com/onsi/ginkgo"
@@ -15,10 +14,13 @@ import (
 var _ = Describe("ChecksConfig", func() {
 
 	Context("Given a valid checksconfig", func() {
+		var unMarshallChecksdConfig *ChecksdConfig
 		var checksdConfig *ChecksdConfig
 		var checksdConfigJson []byte
 
 		BeforeEach(func() {
+			unMarshallChecksdConfig = &ChecksdConfig{}
+
 			checksdConfig = &ChecksdConfig{
 				ChecksPollTime: 1 * time.Second,
 			}
@@ -45,10 +47,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid icmpcheck", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&network.IcmpCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&network.IcmpCheck{
 					Address: "icmp_address",
 					Timeout: 1 * time.Second,
 				}))
@@ -72,10 +74,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid socket check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&network.UnixSocketCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&network.UnixSocketCheck{
 					Timeout:    1 * time.Second,
 					SocketFile: "unix-socket-file",
 				}))
@@ -99,10 +101,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid tcp check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&network.TcpCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&network.TcpCheck{
 					Timeout: 1 * time.Second,
 					Port:    1234,
 				}))
@@ -126,10 +128,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid udp check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&network.UdpCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&network.UdpCheck{
 					Timeout: 1 * time.Second,
 					Port:    1234,
 				}))
@@ -157,10 +159,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid file check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&checks.FileCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&checks.FileCheck{
 					Name:      "name",
 					Path:      "path",
 					IfChanged: "ifchanged",
@@ -193,10 +195,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal valid process check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(1))
-				Expect(checksdConfig.Checks[0]).To(Equal(&checks.ProcessCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(1))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&checks.ProcessCheck{
 					Name:         "name",
 					Pidfile:      "pidfile",
 					StartProgram: "startprogram",
@@ -237,10 +239,10 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal every check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(2))
-				Expect(checksdConfig.Checks[0]).To(Equal(&checks.ProcessCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(2))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&checks.ProcessCheck{
 					Name:         "name",
 					Pidfile:      "pidfile",
 					StartProgram: "startprogram",
@@ -248,7 +250,7 @@ var _ = Describe("ChecksConfig", func() {
 					Group:        "group",
 					DependsOn:    "dependson",
 				}))
-				Expect(checksdConfig.Checks[1]).To(Equal(&network.IcmpCheck{
+				Expect(unMarshallChecksdConfig.Checks[1]).To(Equal(&network.IcmpCheck{
 					Address: "icmp_address",
 					Timeout: 1 * time.Second,
 				}))
@@ -282,20 +284,52 @@ var _ = Describe("ChecksConfig", func() {
 			})
 
 			It("should unmarshal every check", func() {
-				err := json.Unmarshal(checksdConfigJson, checksdConfig)
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(checksdConfig.Checks).To(HaveLen(2))
-				Expect(checksdConfig.Checks[0]).To(Equal(&network.IcmpCheck{
+				Expect(unMarshallChecksdConfig.Checks).To(HaveLen(2))
+				Expect(unMarshallChecksdConfig.Checks[0]).To(Equal(&network.IcmpCheck{
 					Address: "another_icmp_address",
 					Timeout: 2 * time.Second,
 				}))
-				Expect(checksdConfig.Checks[1]).To(Equal(&network.IcmpCheck{
+				Expect(unMarshallChecksdConfig.Checks[1]).To(Equal(&network.IcmpCheck{
 					Address: "icmp_address",
 					Timeout: 1 * time.Second,
 				}))
 
 			})
 
+		})
+	})
+
+	Context("Given a invalid checksconfig", func() {
+		var unMarshallChecksdConfig *ChecksdConfig
+		var checksdConfigJson []byte
+
+		BeforeEach(func() {
+			unMarshallChecksdConfig = &ChecksdConfig{}
+			checksdConfigJson = []byte("invalid config")
+		})
+
+		It("should return error", func() {
+			err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
+			Expect(err).To(HaveOccurred())
+
+		})
+
+		Context("Given multiple checks with some being invalid", func() {
+			BeforeEach(func() {
+				checksdConfigJson = []byte(`{"checksPollTime":1000000000,
+				"checks":[
+					{"Type":"icmp", "CheckProperties":{"Address":"icmp_address","Timeout":1000000000}},
+					{"Type":"unknown"}
+				],"Checks":null}`)
+			})
+
+			It("should return an error", func() {
+				err := json.Unmarshal(checksdConfigJson, unMarshallChecksdConfig)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Check config with type: 'unknown' is not a valid check"))
+			})
 		})
 	})
 })
