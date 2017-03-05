@@ -1,0 +1,119 @@
+{
+    "memo": "c08d3f91b810e8d3def38db60bef9ac6b736645d44cc93b9b27773c25be86ade",
+    "projects": [
+        {
+            "name": "github.com/cloudfoundry/bosh-utils",
+            "branch": "master",
+            "revision": "6593370c83ab0f0dba0965c2563a44c78b42a104",
+            "packages": [
+                "logger"
+            ]
+        },
+        {
+            "name": "github.com/cznic/fileutil",
+            "branch": "master",
+            "revision": "e618435e3202890725c12ccff676e9e3b2592c71",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/golang/go",
+            "branch": "release-branch.go1",
+            "revision": "08b97d4061dd75ceec1d44e4335183cd791c9306",
+            "packages": [
+                "src/pkg/io/ioutil"
+            ]
+        },
+        {
+            "name": "github.com/jessevdk/go-flags",
+            "branch": "master",
+            "revision": "8bc97d602c3bfeb5fc6fc9b5a9c898f245495637",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/onsi/ginkgo",
+            "branch": "master",
+            "revision": "bb93381d543b0e5725244abe752214a110791d01",
+            "packages": [
+                ".",
+                "config",
+                "internal/codelocation",
+                "internal/containernode",
+                "internal/failer",
+                "internal/leafnodes",
+                "internal/remote",
+                "internal/spec",
+                "internal/specrunner",
+                "internal/suite",
+                "internal/testingtproxy",
+                "internal/writer",
+                "reporters",
+                "reporters/stenographer",
+                "reporters/stenographer/support/go-colorable",
+                "reporters/stenographer/support/go-isatty",
+                "types"
+            ]
+        },
+        {
+            "name": "github.com/onsi/gomega",
+            "branch": "master",
+            "revision": "c463cd2a8578290d4be7a25cba69de81cf35785e",
+            "packages": [
+                ".",
+                "format",
+                "gbytes",
+                "gexec",
+                "internal/assertion",
+                "internal/asyncassertion",
+                "internal/oraclematcher",
+                "internal/testingtsupport",
+                "matchers",
+                "matchers/support/goraph/bipartitegraph",
+                "matchers/support/goraph/edge",
+                "matchers/support/goraph/node",
+                "matchers/support/goraph/util",
+                "types"
+            ]
+        },
+        {
+            "name": "github.com/pkg/errors",
+            "version": "v0.8.0",
+            "revision": "645ef00459ed84a119197bfb8d8205042c6df63d",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "golang.org/x/net",
+            "branch": "master",
+            "revision": "4971afdc2f162e82d185353533d3cf16188a9f4e",
+            "packages": [
+                "bpf",
+                "icmp",
+                "internal/iana",
+                "internal/netreflect",
+                "ipv4",
+                "ipv6"
+            ]
+        },
+        {
+            "name": "golang.org/x/sys",
+            "branch": "master",
+            "revision": "e48874b42435b4347fc52bdee0424a52abc974d7",
+            "packages": [
+                "unix"
+            ]
+        },
+        {
+            "name": "gopkg.in/yaml.v2",
+            "branch": "v2",
+            "revision": "a3f3340b5840cee44f372bddb5880fcbc419b46a",
+            "packages": [
+                "."
+            ]
+        }
+    ]
+}

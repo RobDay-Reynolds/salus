@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 bin=$(dirname $0)
 
-reformatted_packages="$($bin/go fmt $($bin/go list github.com/monkeyherder/moirai/... | grep -v /vendor/))"
+reformatted_packages="$($bin/go fmt $($bin/go list github.com/monkeyherder/moirai/... 2>/dev/null | grep -v /vendor/ ))"
 
 if [[ $reformatted_packages = *[![:space:]]* ]]; then
   echo "go fmt reformatted the following packages:"

@@ -1,0 +1,16 @@
+{
+    "dependencies": {
+        "github.com/jessevdk/go-flags": {
+            "branch": "master"
+        },
+        "github.com/onsi/ginkgo": {
+            "branch": "master"
+        },
+        "github.com/onsi/gomega": {
+            "branch": "master"
+        },
+        "golang.org/x/net": {
+            "branch": "master"
+        }
+    }
+}
