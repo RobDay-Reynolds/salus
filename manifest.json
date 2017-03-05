@@ -1,5 +1,8 @@
 {
     "dependencies": {
+        "github.com/cloudfoundry/bosh-utils": {
+            "branch": "master"
+        },
         "github.com/jessevdk/go-flags": {
             "branch": "master"
         },
