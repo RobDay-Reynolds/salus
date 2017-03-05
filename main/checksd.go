@@ -80,8 +80,8 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			logger.Debug(TAG, "sig received: %v", sig)
 			return 0
 		default:
-			for _, icmpCheck := range config.IcmpChecks {
-				checks.Checker(icmpCheck, adaptors.NewNotifierLogger(logger)).Run()
+			for _, check := range config.Checks {
+				checks.Checker(check, adaptors.NewNotifierLogger(logger)).Run()
 			}
 		}
 	}

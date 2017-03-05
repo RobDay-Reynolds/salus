@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/cznic/fileutil"
 	"github.com/golang/go/src/pkg/io/ioutil"
-	"github.com/monkeyherder/moirai/checks/network"
 	"github.com/monkeyherder/moirai/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -41,10 +40,13 @@ var _ = Describe("Checksd", func() {
 		BeforeEach(func() {
 			checksdConfig = config.ChecksdConfig{
 				ChecksPollTime: 1 * time.Second,
-				IcmpChecks: []network.IcmpCheck{
+				ChecksConfig: []config.CheckConfig{
 					{
-						Address: "www.google.com",
-						Timeout: 5 * time.Second,
+						Type: "icmp",
+						CheckProperties: map[string]interface{}{
+							"Address": "www.google.com",
+							"Timeout": 5 * time.Second,
+						},
 					},
 				},
 			}

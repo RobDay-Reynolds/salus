@@ -83,5 +83,5 @@ func getAddr(host string) (net.Addr, error) {
 			return &net.UDPAddr{IP: ip}, nil
 		}
 	}
-	return nil, errors.New("no A or AAAA record")
+	return nil, errors.New("no A record")
 }
