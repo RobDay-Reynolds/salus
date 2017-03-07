@@ -15,7 +15,7 @@ var _ = Describe("IcmpCheck", func() {
 	BeforeEach(func() {
 		icmpCheck = IcmpCheck{
 			Address: "google.com",
-			Timeout: 1 * time.Second,
+			Timeout: 5 * time.Second,
 		}
 	})
 	Context("Given a valid address", func() {
@@ -39,14 +39,14 @@ var _ = Describe("IcmpCheck", func() {
 	Context("Given a invalid address", func() {
 		BeforeEach(func() {
 			icmpCheck = IcmpCheck{
-				Address: "testing-an-invalid-address.invalid",
+				Address: "foo.bar.foo.bar",
 			}
 		})
 
 		It("should return an error", func() {
 			_, err := icmpCheck.Run()
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("lookup testing-an-invalid-address.invalid: no such host"))
+			Expect(err.Error()).To(ContainSubstring("lookup foo.bar.foo.bar: no such host"))
 		})
 	})
 
