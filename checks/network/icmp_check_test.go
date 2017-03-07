@@ -46,7 +46,7 @@ var _ = Describe("IcmpCheck", func() {
 		It("should return an error", func() {
 			_, err := icmpCheck.Run()
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("lookup foo.bar.foo.bar: no such host"))
+			Expect(err.Error()).To(MatchRegexp("lookup foo.bar.foo.bar.* no such host"))
 		})
 	})
 
