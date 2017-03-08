@@ -1,0 +1,32 @@
+---
+groups:
+  - name: chex
+    jobs:
+      - run-unit
+      - run-integration
+
+jobs:
+  - name: run-unit
+    public: true
+    serial: false
+    plan:
+      - get: src
+        trigger: true
+      - task: run-tests
+        file: src/ci/tasks/test-unit.yml
+
+  - name: run-integration
+    public: true
+    serial: false
+    plan:
+      - get: src
+        trigger: true
+      - task: run-tests
+        file: src/ci/tasks/test-integration.yml
+
+resources:
+  - name: src
+    type: git
+    source:
+      uri: http://github.com/monkeyherder/moirai
+      branch: master
