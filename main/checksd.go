@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"net/http"
 )
 
 const TAG string = "checksd"
@@ -73,9 +74,14 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	sigChannel := make(chan os.Signal, 8)
 	signal.Notify(sigChannel, syscall.SIGTERM, os.Interrupt, os.Kill)
 
+	serverErrChannel := startHealthCheckHttpServerAsync()
+
 	for {
 		time.Sleep(config.ChecksPollTime)
 		select {
+		case serverErr := <-serverErrChannel:
+			logger.Error(TAG, "http server errored with: %v", serverErr)
+			return -1
 		case sig := <-sigChannel:
 			logger.Debug(TAG, "sig received: %v", sig)
 			return 0
@@ -85,4 +91,17 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			}
 		}
 	}
+}
+
+func startHealthCheckHttpServerAsync() chan error {
+	http.HandleFunc("/", http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
+		resp.Write([]byte(`{}`))
+	}))
+
+	serverError := make(chan error, 1)
+	go func() {
+		serverError <- http.ListenAndServe(":8080", nil)
+	}()
+
+	return serverError
 }

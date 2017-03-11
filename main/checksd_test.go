@@ -14,6 +14,7 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
+	"net/http"
 )
 
 var _ = Describe("Checksd", func() {
@@ -50,6 +51,21 @@ var _ = Describe("Checksd", func() {
 					},
 				},
 			}
+		})
+
+		It("should serve http requests", func() {
+			command := act(checksdConfig)
+
+			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+			Expect(err).ShouldNot(HaveOccurred())
+			Eventually(session, 10).Should(gbytes.Say("After Check ran"))
+
+			resp, err := http.DefaultClient.Get("http://localhost:8080/")
+			Expect(err).ToNot(HaveOccurred())
+			contents, err := ioutil.ReadAll(resp.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(contents).To(MatchJSON(`{}`))
 		})
 
 		It("Should run health check", func() {
