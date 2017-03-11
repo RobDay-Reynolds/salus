@@ -3,16 +3,16 @@ package main
 import (
 	"encoding/json"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/jessevdk/go-flags"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors"
 	"github.com/monkeyherder/moirai/config"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"net/http"
 )
 
 const TAG string = "checksd"

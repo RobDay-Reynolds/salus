@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cznic/fileutil"
-	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/monkeyherder/moirai/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"syscall"
 	"time"
-	"net/http"
 )
 
 var _ = Describe("Checksd", func() {
