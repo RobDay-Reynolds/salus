@@ -26,9 +26,19 @@ var _ = Describe("Notify", func() {
 
 		BeforeEach(func() {
 			successCheckFn = checks.CheckFunc(func() (checks.CheckInfo, error) {
-				return checks.CheckInfo{}, nil
+				return checks.CheckInfo{
+					Status: "all good",
+					Note:   "note",
+				}, nil
 			})
 			checkWithNotifier = notifier(successCheckFn)
+		})
+
+		It("should return the underlying checkinfo it is wrapping", func() {
+			checkInfo, checkErr := checkWithNotifier.Run()
+			Expect(checkInfo.Status).To(Equal("all good"))
+			Expect(checkInfo.Note).To(Equal("note"))
+			Expect(checkErr).ToNot(HaveOccurred())
 		})
 
 		It("should notify that the check has run", func() {

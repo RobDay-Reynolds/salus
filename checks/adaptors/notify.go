@@ -23,12 +23,12 @@ func Notify(notifier Notifier) checks.CheckAdaptor {
 	return func(check checks.Check) checks.Check {
 		return checks.CheckFunc(func() (checks.CheckInfo, error) {
 			notifier.BeforeCheck(check)
-			_, err := check.Run()
+			checkInfo, err := check.Run()
 			if err != nil {
 				notifier.OnError(check, err)
 			}
 			notifier.AfterCheck(check)
-			return checks.CheckInfo{}, err
+			return checkInfo, err
 		})
 	}
 }
