@@ -3,14 +3,13 @@ package adaptors_test
 import (
 	. "github.com/monkeyherder/moirai/checks/adaptors"
 
-	"encoding/json"
 	"errors"
+	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/moirai/checks/adaptors/adaptorsfakes"
 	"github.com/monkeyherder/moirai/checks/checksfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
 )
 
 var _ = Describe("PersistCheckStatusSummary", func() {
@@ -18,14 +17,12 @@ var _ = Describe("PersistCheckStatusSummary", func() {
 	Context("Given a check", func() {
 		var persistCheckAdaptor checks.CheckAdaptor
 		var fakeCheck *checksfakes.FakeCheck
-		var pathToCheckSummaryFile string
+		var fakeCheckStatusWriter *adaptorsfakes.FakeCheckStatusWriter
 
 		BeforeEach(func() {
-			tempFile, err := ioutil.TempFile(os.TempDir(), "checksummarytestfile")
-			Expect(err).ToNot(HaveOccurred())
-			pathToCheckSummaryFile = tempFile.Name()
+			fakeCheckStatusWriter = &adaptorsfakes.FakeCheckStatusWriter{}
 
-			persistCheckAdaptor = PersistCheckSummary(pathToCheckSummaryFile)
+			persistCheckAdaptor = PersistCheckStatus(fakeCheckStatusWriter, &loggerfakes.FakeLogger{})
 			fakeCheck = &checksfakes.FakeCheck{}
 		})
 
@@ -46,14 +43,40 @@ var _ = Describe("PersistCheckStatusSummary", func() {
 				Expect(checkErr).To(HaveOccurred())
 				Expect(checkErr.Error()).To(ContainSubstring("error too"))
 
-				Expect(pathToCheckSummaryFile).To(BeAnExistingFile())
-				checkSummaryContents, err := ioutil.ReadFile(pathToCheckSummaryFile)
-				Expect(err).ToNot(HaveOccurred())
+				checkStatusArg := fakeCheckStatusWriter.WriteArgsForCall(0)
+				Expect(checkStatusArg.CheckInfo.Status).To(Equal("Not good"))
+				Expect(checkStatusArg.CheckInfo.Note).To(Equal("didn't go well"))
+				Expect(checkStatusArg.CheckError).To(HaveOccurred())
+				Expect(checkStatusArg.CheckError.Error()).To(ContainSubstring("error too"))
+			})
 
-				actualCheckSummary := &CheckSummary{}
-				json.Unmarshal(checkSummaryContents, actualCheckSummary)
+			Context("with the check status writer failing to write", func() {
+				BeforeEach(func() {
+					fakeCheckStatusWriter.WriteReturns(errors.New("unable to write the check summary due to reasons"))
+				})
 
-				//Expect(actualCheckSummary.CheckSummary).To(HaveLen(1))
+				It("should panic", func() {
+					Expect(func() { persistCheckAdaptor(fakeCheck).Run() }).To(Panic())
+				})
+			})
+		})
+
+		Context("with a healthy status response", func() {
+			BeforeEach(func() {
+				failCheckInfo := checks.CheckInfo{
+					Status: "All good",
+					Note:   "went well",
+				}
+				fakeCheck.RunReturns(failCheckInfo, nil)
+			})
+
+			It("should not write checkinfo with an error", func() {
+				persistCheckAdaptor(fakeCheck).Run()
+
+				checkStatusArg := fakeCheckStatusWriter.WriteArgsForCall(0)
+				Expect(checkStatusArg.CheckInfo.Status).To(Equal("All good"))
+				Expect(checkStatusArg.CheckInfo.Note).To(Equal("went well"))
+				Expect(checkStatusArg.CheckError).ToNot(HaveOccurred())
 			})
 		})
 
