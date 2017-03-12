@@ -22,7 +22,7 @@ var _ = Describe("PersistCheckStatusSummary", func() {
 		BeforeEach(func() {
 			fakeCheckStatusWriter = &adaptorsfakes.FakeCheckStatusWriter{}
 
-			persistCheckAdaptor = PersistCheckStatus(fakeCheckStatusWriter, &loggerfakes.FakeLogger{})
+			persistCheckAdaptor = MustPersistCheckStatus(fakeCheckStatusWriter, &loggerfakes.FakeLogger{})
 			fakeCheck = &checksfakes.FakeCheck{}
 		})
 
@@ -44,10 +44,10 @@ var _ = Describe("PersistCheckStatusSummary", func() {
 				Expect(checkErr.Error()).To(ContainSubstring("error too"))
 
 				checkStatusArg := fakeCheckStatusWriter.WriteArgsForCall(0)
+				Expect(checkStatusArg.CheckType).To(Equal("*checksfakes.FakeCheck"))
 				Expect(checkStatusArg.CheckInfo.Status).To(Equal("Not good"))
 				Expect(checkStatusArg.CheckInfo.Note).To(Equal("didn't go well"))
-				Expect(checkStatusArg.CheckError).To(HaveOccurred())
-				Expect(checkStatusArg.CheckError.Error()).To(ContainSubstring("error too"))
+				Expect(checkStatusArg.CheckError).To(ContainSubstring("error too"))
 			})
 
 			Context("with the check status writer failing to write", func() {
@@ -76,7 +76,7 @@ var _ = Describe("PersistCheckStatusSummary", func() {
 				checkStatusArg := fakeCheckStatusWriter.WriteArgsForCall(0)
 				Expect(checkStatusArg.CheckInfo.Status).To(Equal("All good"))
 				Expect(checkStatusArg.CheckInfo.Note).To(Equal("went well"))
-				Expect(checkStatusArg.CheckError).ToNot(HaveOccurred())
+				Expect(checkStatusArg.CheckError).ToNot(BeNil())
 			})
 		})
 

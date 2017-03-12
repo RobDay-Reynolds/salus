@@ -3,30 +3,38 @@ package adaptors
 import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/moirai/checks/checksfakes"
+	"reflect"
+	"time"
 )
 
 const TAG string = "PersistCheckStatus"
 
 type Status struct {
+	Modified   time.Time
+	CheckType  string `json:"-"`
 	CheckInfo  checks.CheckInfo
-	CheckError error
-}
-
-type CheckStatus struct {
-	CheckStatus []Status
+	CheckError string
 }
 
 type CheckStatusWriter interface {
-	Write(summary Status) error
+	Write(status Status) error
 }
 
-func PersistCheckStatus(checkSummaryWriter CheckStatusWriter, Logger boshlog.Logger) checks.CheckAdaptor {
+func MustPersistCheckStatus(checkSummaryWriter CheckStatusWriter, Logger boshlog.Logger) checks.CheckAdaptor {
 	return func(check checks.Check) checks.Check {
 		return checks.CheckFunc(func() (checks.CheckInfo, error) {
 			checkInfo, err := check.Run()
+
+			var errString string
+			if err != nil {
+				errString = err.Error()
+			}
 			writerErr := checkSummaryWriter.Write(Status{
+				CheckType:  reflect.TypeOf(&checksfakes.FakeCheck{}).String(),
+				Modified:   time.Now(),
 				CheckInfo:  checkInfo,
-				CheckError: err,
+				CheckError: errString,
 			})
 
 			if writerErr != nil {
