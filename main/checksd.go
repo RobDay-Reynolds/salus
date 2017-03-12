@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/FiloSottile/gvt/fileutils"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/jessevdk/go-flags"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors"
+	"github.com/monkeyherder/moirai/checks/writer"
 	"github.com/monkeyherder/moirai/config"
 	"io/ioutil"
 	"net/http"
@@ -75,7 +77,9 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	signal.Notify(sigChannel, syscall.SIGTERM, os.Interrupt, os.Kill)
 
 	serverErrChannel := startHealthCheckHttpServerAsync()
-
+	statusWriter := writer.CheckSummaryWriter{
+		PathToCheckSummary: config.CheckStatusFilePath,
+	}
 	for {
 		time.Sleep(config.ChecksPollTime)
 		select {
@@ -86,8 +90,12 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			logger.Debug(TAG, "sig received: %v", sig)
 			return 0
 		default:
+			fileutils.RemoveAll(config.CheckStatusFilePath)
 			for _, check := range config.Checks {
-				checks.Checker(check, adaptors.NewNotifierLogger(logger)).Run()
+				checks.Checker(check,
+					adaptors.MustPersistCheckStatus(statusWriter, logger),
+					adaptors.NewNotifierLogger(logger),
+				).Run()
 			}
 		}
 	}

@@ -25,9 +25,10 @@ type CheckConfig struct {
 }
 
 type ChecksdConfig struct {
-	ChecksPollTime time.Duration `json:"checksPollTime"`
-	ChecksConfig   []CheckConfig `json:"checks"`
-	Checks         []checks.Check
+	CheckStatusFilePath string        `json:"checkStatusPath"`
+	ChecksPollTime      time.Duration `json:"checksPollTime"`
+	ChecksConfig        []CheckConfig `json:"checks"`
+	Checks              []checks.Check
 }
 
 func (c *ChecksdConfig) UnmarshalJSON(b []byte) error {

@@ -3,7 +3,6 @@ package adaptors
 import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/checksfakes"
 	"reflect"
 	"time"
 )
@@ -31,7 +30,7 @@ func MustPersistCheckStatus(checkSummaryWriter CheckStatusWriter, Logger boshlog
 				errString = err.Error()
 			}
 			writerErr := checkSummaryWriter.Write(Status{
-				CheckType:  reflect.TypeOf(&checksfakes.FakeCheck{}).String(),
+				CheckType:  reflect.TypeOf(check).String(),
 				Modified:   time.Now(),
 				CheckInfo:  checkInfo,
 				CheckError: errString,
