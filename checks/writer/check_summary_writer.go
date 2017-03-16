@@ -21,6 +21,7 @@ type CheckSummaryWriter struct {
 
 func (csw CheckSummaryWriter) Write(status adaptors.Status) error {
 	checkSummaryFile, err := os.OpenFile(csw.PathToCheckSummary, os.O_RDWR|os.O_CREATE, 0600)
+	defer checkSummaryFile.Close()
 
 	fileContents, err := ioutil.ReadAll(checkSummaryFile)
 	if err != nil {
@@ -53,6 +54,13 @@ func (csw CheckSummaryWriter) Write(status adaptors.Status) error {
 	}
 
 	_, err = tempFile.Write(checkStatusJson)
+	defer func() {
+		_, err := tempFile.Stat()
+		if err != nil {
+			os.Remove(tempFile.Name())
+		}
+	}()
+
 	if err != nil {
 		csw.Logger.Error(TAG, "unable to write json into temp file: %s", err.Error())
 		return err
