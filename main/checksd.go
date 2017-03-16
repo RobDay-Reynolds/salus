@@ -79,6 +79,7 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	serverErrChannel := startHealthCheckHttpServerAsync()
 	statusWriter := writer.CheckSummaryWriter{
 		PathToCheckSummary: config.CheckStatusFilePath,
+		Logger:             logger,
 	}
 	for {
 		time.Sleep(config.ChecksPollTime)

@@ -42,7 +42,6 @@ var _ = Describe("Checksd", func() {
 
 		BeforeEach(func() {
 			fileSummaryJsonPath = filepath.Join(os.TempDir(), "summary.json")
-
 			checksdConfig = config.ChecksdConfig{
 				CheckStatusFilePath: fileSummaryJsonPath,
 				ChecksPollTime:      1 * time.Second,
