@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cznic/fileutil"
 	"github.com/golang/go/src/pkg/path/filepath"
+	"github.com/monkeyherder/moirai/checks/writer"
 	"github.com/monkeyherder/moirai/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,7 +17,6 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
-	"github.com/monkeyherder/moirai/checks/writer"
 )
 
 var _ = Describe("Checksd", func() {
@@ -75,7 +75,7 @@ var _ = Describe("Checksd", func() {
 
 			Expect(status.CheckStatus).To(HaveKey("*network.IcmpCheck"))
 			Expect(status.CheckStatus["*network.IcmpCheck"]).To(HaveLen(1))
-			Expect(status.CheckStatus["*network.IcmpCheck"][0].Modified).Should(BeTemporally("~", time.Now(), 10  * time.Second))
+			Expect(status.CheckStatus["*network.IcmpCheck"][0].Modified).Should(BeTemporally("~", time.Now(), 10*time.Second))
 		})
 
 		It("should persis check status to file", func() {
