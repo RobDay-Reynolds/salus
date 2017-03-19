@@ -26,7 +26,7 @@ type ConfigOpts struct {
 
 func main() {
 	exitCode := 0
-	asyncLog := boshlog.NewAsyncWriterLogger(boshlog.LevelDebug, os.Stdout, os.Stderr)
+	asyncLog := boshlog.NewAsyncWriterLogger(boshlog.LevelInfo, os.Stdout, os.Stderr)
 	defer func() {
 		asyncLog.FlushTimeout(time.Minute)
 		os.Exit(exitCode)
@@ -89,7 +89,7 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			logger.Error(TAG, "http server errored with: %v", serverErr)
 			return -1
 		case sig := <-sigChannel:
-			logger.Debug(TAG, "sig received: %v", sig)
+			logger.Info(TAG, "sig received: %v", sig)
 			return 0
 		case <-runCheckChannel:
 			fileutils.RemoveAll(config.CheckStatusFilePath)

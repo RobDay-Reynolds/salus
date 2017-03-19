@@ -38,13 +38,13 @@ type notifierLogger struct {
 }
 
 func (n notifierLogger) BeforeCheck(check checks.Check) {
-	n.Logger.Debug(reflect.TypeOf(check).Name(), "Before Check ran")
+	n.Logger.Info(reflect.TypeOf(check).Name(), "Before Check ran")
 }
 
 func (n notifierLogger) AfterCheck(check checks.Check) {
-	n.Logger.Debug(reflect.TypeOf(check).Name(), "After Check ran")
+	n.Logger.Info(reflect.TypeOf(check).Name(), "After Check ran")
 }
 
 func (n notifierLogger) OnError(check checks.Check, err error) {
-	n.Logger.Error(reflect.TypeOf(check).Name(), "Error occurred", err)
+	n.Logger.Info(reflect.TypeOf(check).Name(), "Error occurred", err)
 }
