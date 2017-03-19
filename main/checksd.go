@@ -81,8 +81,9 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 		PathToCheckSummary: config.CheckStatusFilePath,
 		Logger:             logger,
 	}
+	runCheckChannel := checkRunnerScheduler(config.ChecksPollTime)
+
 	for {
-		time.Sleep(config.ChecksPollTime)
 		select {
 		case serverErr := <-serverErrChannel:
 			logger.Error(TAG, "http server errored with: %v", serverErr)
@@ -90,7 +91,7 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 		case sig := <-sigChannel:
 			logger.Debug(TAG, "sig received: %v", sig)
 			return 0
-		default:
+		case <-runCheckChannel:
 			fileutils.RemoveAll(config.CheckStatusFilePath)
 			for _, check := range config.Checks {
 				checks.Checker(check,
@@ -100,6 +101,18 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			}
 		}
 	}
+}
+
+func checkRunnerScheduler(pollTime time.Duration) chan bool {
+	var runCheckChannel chan bool = make(chan bool, 1)
+
+	go func() {
+		for {
+			time.Sleep(pollTime)
+			runCheckChannel <- true
+		}
+	}()
+	return runCheckChannel
 }
 
 func startHealthCheckHttpServerAsync(checkStatusFilePath string) chan error {
