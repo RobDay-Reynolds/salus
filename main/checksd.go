@@ -76,7 +76,7 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	sigChannel := make(chan os.Signal, 8)
 	signal.Notify(sigChannel, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	serverErrChannel := startHealthCheckHttpServerAsync()
+	serverErrChannel := startHealthCheckHttpServerAsync(config.CheckStatusFilePath)
 	statusWriter := writer.CheckSummaryWriter{
 		PathToCheckSummary: config.CheckStatusFilePath,
 		Logger:             logger,
@@ -102,9 +102,10 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 	}
 }
 
-func startHealthCheckHttpServerAsync() chan error {
+func startHealthCheckHttpServerAsync(checkStatusFilePath string) chan error {
 	http.HandleFunc("/", http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-		resp.Write([]byte(`{}`))
+		contents, _ := ioutil.ReadFile(checkStatusFilePath)
+		resp.Write(contents)
 	}))
 
 	serverError := make(chan error, 1)

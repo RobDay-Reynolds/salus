@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
+	"github.com/monkeyherder/moirai/checks/writer"
 )
 
 var _ = Describe("Checksd", func() {
@@ -69,7 +70,12 @@ var _ = Describe("Checksd", func() {
 			contents, err := ioutil.ReadAll(resp.Body)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(contents).To(MatchJSON(`{}`))
+			status := writer.CheckStatus{}
+			json.Unmarshal(contents, &status)
+
+			Expect(status.CheckStatus).To(HaveKey("*network.IcmpCheck"))
+			Expect(status.CheckStatus["*network.IcmpCheck"]).To(HaveLen(1))
+			Expect(status.CheckStatus["*network.IcmpCheck"][0].Modified).Should(BeTemporally("~", time.Now(), 10  * time.Second))
 		})
 
 		It("should persis check status to file", func() {
