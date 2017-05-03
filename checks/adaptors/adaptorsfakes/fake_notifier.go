@@ -4,8 +4,8 @@ package adaptorsfakes
 import (
 	"sync"
 
-	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/adaptors"
+	"github.com/monkeyherder/salus/checks"
+	"github.com/monkeyherder/salus/checks/adaptors"
 )
 
 type FakeNotifier struct {

@@ -4,7 +4,7 @@ package adaptorsfakes
 import (
 	"sync"
 
-	"github.com/monkeyherder/moirai/checks/adaptors"
+	"github.com/monkeyherder/salus/checks/adaptors"
 )
 
 type FakeCheckStatusWriter struct {

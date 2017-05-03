@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 )
 
 type UnixSocketCheck struct {

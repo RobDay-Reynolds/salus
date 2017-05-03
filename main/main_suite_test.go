@@ -17,7 +17,7 @@ var pathToChecksd string
 
 var _ = BeforeSuite(func() {
 	var err error
-	pathToChecksd, err = gexec.Build("github.com/monkeyherder/moirai/main")
+	pathToChecksd, err = gexec.Build("github.com/monkeyherder/salus/main")
 	Ω(err).ShouldNot(HaveOccurred())
 })
 

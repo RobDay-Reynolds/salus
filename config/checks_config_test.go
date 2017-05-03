@@ -1,11 +1,11 @@
 package config_test
 
 import (
-	. "github.com/monkeyherder/moirai/config"
+	. "github.com/monkeyherder/salus/config"
 
 	"encoding/json"
-	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/network"
+	"github.com/monkeyherder/salus/checks"
+	"github.com/monkeyherder/salus/checks/network"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"time"

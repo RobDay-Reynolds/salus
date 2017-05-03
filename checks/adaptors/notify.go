@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 )
 
 func NewNotifierLogger(logger boshlog.Logger) checks.CheckAdaptor {

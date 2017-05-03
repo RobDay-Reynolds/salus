@@ -4,9 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 
-	. "github.com/monkeyherder/moirai/monit"
+	. "github.com/monkeyherder/salus/monit"
 )
 
 var _ = Describe("ReadMonitFile", func() {

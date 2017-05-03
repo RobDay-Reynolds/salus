@@ -7,7 +7,7 @@ source ~/.bashrc
 export PATH=/usr/local/ruby/bin:/usr/local/go/bin:$PATH
 export GOPATH=$(pwd)/gopath
 
-cd gopath/src/github.com/monkeyherder/moirai
+cd gopath/src/github.com/monkeyherder/salus
 bin/require-ci-golang-version
 bin/clean
 bin/install-ginkgo

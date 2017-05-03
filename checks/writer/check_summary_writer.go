@@ -3,7 +3,7 @@ package writer
 import (
 	"encoding/json"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/monkeyherder/moirai/checks/adaptors"
+	"github.com/monkeyherder/salus/checks/adaptors"
 	"io/ioutil"
 	"os"
 )

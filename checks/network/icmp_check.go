@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 )
 
 // http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml

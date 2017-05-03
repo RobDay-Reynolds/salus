@@ -1,12 +1,12 @@
 package writer_test
 
 import (
-	. "github.com/monkeyherder/moirai/checks/writer"
+	. "github.com/monkeyherder/salus/checks/writer"
 
 	"github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cznic/fileutil"
-	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/adaptors"
+	"github.com/monkeyherder/salus/checks"
+	"github.com/monkeyherder/salus/checks/adaptors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"

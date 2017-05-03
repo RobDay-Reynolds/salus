@@ -4,4 +4,4 @@ set -e
 
 bin=$(dirname $0)
 
-$bin/go build -o $bin/../out/checksd github.com/monkeyherder/moirai/main
+$bin/go build -o $bin/../out/checksd github.com/monkeyherder/salus/main

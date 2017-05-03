@@ -28,5 +28,5 @@ resources:
   - name: src
     type: git
     source:
-      uri: http://github.com/monkeyherder/moirai
+      uri: http://github.com/monkeyherder/salus
       branch: master

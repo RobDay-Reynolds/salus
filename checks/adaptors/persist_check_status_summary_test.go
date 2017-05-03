@@ -1,13 +1,13 @@
 package adaptors_test
 
 import (
-	. "github.com/monkeyherder/moirai/checks/adaptors"
+	. "github.com/monkeyherder/salus/checks/adaptors"
 
 	"errors"
 	"github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
-	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/adaptors/adaptorsfakes"
-	"github.com/monkeyherder/moirai/checks/checksfakes"
+	"github.com/monkeyherder/salus/checks"
+	"github.com/monkeyherder/salus/checks/adaptors/adaptorsfakes"
+	"github.com/monkeyherder/salus/checks/checksfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

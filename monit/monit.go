@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 )
 
 type MonitFile struct {

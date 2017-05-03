@@ -1,7 +1,7 @@
 package network_test
 
 import (
-	. "github.com/monkeyherder/moirai/checks/network"
+	. "github.com/monkeyherder/salus/checks/network"
 
 	"time"
 

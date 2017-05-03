@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/monkeyherder/moirai/checks"
+	. "github.com/monkeyherder/salus/checks"
 )
 
 var _ = Describe("FileCheck", func() {

@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/monkeyherder/moirai/checks"
-	"github.com/monkeyherder/moirai/checks/network"
+	"github.com/monkeyherder/salus/checks"
+	"github.com/monkeyherder/salus/checks/network"
 	"github.com/pkg/errors"
 	"time"
 )

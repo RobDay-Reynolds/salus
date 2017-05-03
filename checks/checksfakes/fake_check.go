@@ -4,7 +4,7 @@ package checksfakes
 import (
 	"sync"
 
-	"github.com/monkeyherder/moirai/checks"
+	"github.com/monkeyherder/salus/checks"
 )
 
 type FakeCheck struct {
