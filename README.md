@@ -1,8 +1,8 @@
-# moirai
+# salus
 Monitor processes and services
 
 # Minimum Requirements
-Currently Moirai works with:
+Currently Salus works with:
 - Golang >= 1.8
 
 # Example config to run checksd:
