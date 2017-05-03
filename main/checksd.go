@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/FiloSottile/gvt/fileutils"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/jessevdk/go-flags"
 	"github.com/monkeyherder/moirai/checks"
@@ -92,7 +91,7 @@ func startDaemon(logger boshlog.Logger, config *config.ChecksdConfig) int {
 			logger.Info(TAG, "sig received: %v", sig)
 			return 0
 		case <-runCheckChannel:
-			fileutils.RemoveAll(config.CheckStatusFilePath)
+			os.RemoveAll(config.CheckStatusFilePath)
 			for _, check := range config.Checks {
 				checks.Checker(check,
 					adaptors.MustPersistCheckStatus(statusWriter, logger),

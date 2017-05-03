@@ -3,8 +3,8 @@ package writer
 import (
 	"encoding/json"
 	"github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/monkeyherder/moirai/checks/adaptors"
+	"io/ioutil"
 	"os"
 )
 

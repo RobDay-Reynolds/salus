@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/cznic/fileutil"
-	"github.com/golang/go/src/pkg/path/filepath"
 	"github.com/monkeyherder/moirai/checks/writer"
 	"github.com/monkeyherder/moirai/config"
 	. "github.com/onsi/ginkgo"
@@ -15,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 	"time"
 )
