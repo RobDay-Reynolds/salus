@@ -1,0 +1,16 @@
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/cloudfoundry/bosh-utils"
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/jessevdk/go-flags"
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/onsi/ginkgo"
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/onsi/gomega"

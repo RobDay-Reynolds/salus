@@ -1,0 +1,55 @@
+memo = "748633ce9769cbcbf306153f30753393be212103ab3a2972c600e09f1064f250"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cloudfoundry/bosh-utils"
+  packages = ["logger","logger/loggerfakes"]
+  revision = "1cf51df588feb265a3fb764dd3342ca46bf44ade"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/cznic/fileutil"
+  packages = ["."]
+  revision = "90cf820aafe8f7df39416fdbb932029ff99bd1ab"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/jessevdk/go-flags"
+  packages = ["."]
+  revision = "460c7bb0abd6e927f2767cadc91aa6ef776a98b4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/onsi/ginkgo"
+  packages = [".","config","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
+  revision = "83438ca4278f2f56757b9ab2cb15dd4f596d84e8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/onsi/gomega"
+  packages = [".","format","gbytes","gexec","internal/assertion","internal/asyncassertion","internal/oraclematcher","internal/testingtsupport","matchers","matchers/support/goraph/bipartitegraph","matchers/support/goraph/edge","matchers/support/goraph/node","matchers/support/goraph/util","types"]
+  revision = "da367351331c75190afec7ed3a0c61e0016942ed"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["bpf","icmp","internal/iana","internal/netreflect","ipv4","ipv6"]
+  revision = "0819898fb4973868bba6de59b6aaad75beea9a6a"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "9ccfe848b9db8435a24c424abbc07a921adf1df5"
+
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
