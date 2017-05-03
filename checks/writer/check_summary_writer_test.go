@@ -5,11 +5,11 @@ import (
 
 	"github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cznic/fileutil"
-	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/monkeyherder/moirai/checks"
 	"github.com/monkeyherder/moirai/checks/adaptors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"io/ioutil"
 	"os"
 )
 

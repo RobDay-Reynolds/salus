@@ -42,7 +42,7 @@ func NewUdpCheck(port int, timeout time.Duration) UdpCheck {
 		Timeout: timeout,
 		Protocol: func(udpConn UdpCon) error {
 			udpConn.SetReadDeadline(time.Now().Add(timeout))
-			udpConn.Write([]byte(""))
+			udpConn.Write([]byte(" "))
 
 			_, err := udpConn.Read(make([]byte, 1))
 			if err != nil {
