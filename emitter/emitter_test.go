@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("NatsClient", func() {
+var _ = Describe("Emitter", func() {
 	var emitter *Emitter
 	var fakeNatsClient *emitterfakes.FakeClient
 
@@ -28,7 +28,7 @@ var _ = Describe("NatsClient", func() {
 		emitter.Shutdown()
 	})
 
-	It("should emite checks to nats client", func() {
+	It("should emit checks to nats client", func() {
 		checkChannel := emitter.EmitCheck()
 
 		checkChannel <- checks.CheckInfo{
