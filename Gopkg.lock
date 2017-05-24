@@ -1,4 +1,4 @@
-memo = "748633ce9769cbcbf306153f30753393be212103ab3a2972c600e09f1064f250"
+memo = "5d4446f4ad3901dd14db3b3b185e7464e1021a2b29dac251bfdd30b925460f22"
 
 [[projects]]
   branch = "master"
@@ -19,6 +19,24 @@ memo = "748633ce9769cbcbf306153f30753393be212103ab3a2972c600e09f1064f250"
   revision = "460c7bb0abd6e927f2767cadc91aa6ef776a98b4"
 
 [[projects]]
+  name = "github.com/nats-io/gnatsd"
+  packages = ["auth","conf","logger","server","server/pse","util"]
+  revision = "5dcad241bcd7fff3aac6e9f8b47350f071f5fd38"
+  version = "v0.9.6"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/nats-io/go-nats"
+  packages = [".","encoders/builtin","util"]
+  revision = "d912fba7a7dcab415f4efc7a381814863ea26dbc"
+
+[[projects]]
+  name = "github.com/nats-io/nuid"
+  packages = ["."]
+  revision = "289cccf02c178dc782430d534e3c1f5b72af807f"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/onsi/ginkgo"
   packages = [".","config","internal/codelocation","internal/containernode","internal/failer","internal/leafnodes","internal/remote","internal/spec","internal/spec_iterator","internal/specrunner","internal/suite","internal/testingtproxy","internal/writer","reporters","reporters/stenographer","reporters/stenographer/support/go-colorable","reporters/stenographer/support/go-isatty","types"]
@@ -35,6 +53,12 @@ memo = "748633ce9769cbcbf306153f30753393be212103ab3a2972c600e09f1064f250"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["bcrypt","blowfish","ssh/terminal"]
+  revision = "6c586e17d90a7d08bbbc4069984180dce3b04117"
 
 [[projects]]
   branch = "master"
